@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Women's T-Shirts — RedStore Online Shopping</title>
+	<meta name="description" content="Shop latest women's t-shirts at RedStore." />
+	<style>
+		:root{--red:#e53935;--dark:#222;--muted:#666;--bg:#f7f7f8;--card:#fff}
+		*{box-sizing:border-box}
+		body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0;background:var(--bg);color:var(--dark)}
+		header{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:20}
+		.topbar{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+		.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--dark)}
+		.logo{width:40px;height:40px;background:linear-gradient(135deg,#ff8a80,var(--red));border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+		nav{display:flex;gap:14px;align-items:center}
+		nav a{color:var(--muted);text-decoration:none;font-size:14px}
+		nav .cat-link{padding:8px 12px;border-radius:6px;transition:all 0.2s}
+		nav .cat-link:hover{background:#f5f5f5;color:var(--dark)}
+		.cat-container{position:relative;padding-bottom:12px}
+		.cat-dropdown{position:absolute;top:calc(100% + 8px);left:0;background:#fff;border:1px solid #eee;border-radius:8px;min-width:180px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:100;pointer-events:auto;opacity:0;visibility:hidden;transition:opacity 0.2s, visibility 0.2s}
+		.cat-container:hover .cat-dropdown{opacity:1;visibility:visible}
+		.cat-dropdown a{display:block;padding:10px 16px;color:var(--muted);text-decoration:none;border-bottom:1px solid #f5f5f5;font-size:14px;pointer-events:auto}
+		.cat-dropdown a:last-child{border-bottom:none}
+		.cat-dropdown a:hover{background:var(--red);color:#fff}
+		.search{flex:1;margin:0 18px}
+		.search input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #e6e6e6}
+		.actions{display:flex;gap:12px;align-items:center}
+		.cart{position:relative}
+		.cart button{background:transparent;border:1px solid #eee;padding:8px 10px;border-radius:8px;cursor:pointer}
+		.badge{position:absolute;right:0;top:-6px;background:var(--red);color:#fff;border-radius:999px;padding:2px 6px;font-size:12px}
+
+		.breadcrumb{max-width:1100px;margin:12px auto;padding:0 16px;font-size:13px;color:var(--muted)}
+		.breadcrumb a{color:var(--red);text-decoration:none;margin:0 4px}
+
+		.banner{max-width:1100px;margin:18px auto;padding:20px;background:linear-gradient(90deg,#fff,#f5f5f5);border-radius:12px}
+		.banner h1{margin:0;font-size:32px}
+		.banner p{color:var(--muted);margin:6px 0 0}
+
+		.container{max-width:1100px;margin:18px auto;padding:0 16px}
+		.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+		.card{background:var(--card);border-radius:12px;padding:12px;border:1px solid #eee;transition:transform 0.2s,box-shadow 0.2s}
+		.card:hover{transform:translateY(-4px);box-shadow:0 8px 16px rgba(0,0,0,0.1)}
+		.card img{width:100%;height:200px;object-fit:cover;border-radius:8px}
+		.card h3{margin:10px 0 6px;font-size:16px}
+		.price{font-weight:700;color:var(--dark)}
+		.muted{color:var(--muted);font-size:13px}
+		.card .actions{margin-top:10px}
+		.btn{padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px}
+		.btn-primary{background:var(--red);color:#fff}
+
+		footer{margin-top:28px;padding:28px 0;background:#fff;border-top:1px solid #eee}
+		.footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:0 16px}
+
+		@media (max-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
+		@media (max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.search{display:none}.topbar{padding:10px}}
+		@media (max-width:420px){.grid{grid-template-columns:1fr}.brand span{display:none}}
+	</style>
+</head>
+<body>
+	<header>
+		<div class="topbar">
+			<a class="brand" href="/">
+				<div class="logo">R</div>
+				<div>
+					<div style="font-weight:700">RedStore</div>
+					<div style="font-size:12px;color:var(--muted)">redstore.in</div>
+				</div>
+			</a>
+			<nav>
+				<div class="cat-container">
+					<a class="cat-link" href="/men.html">Men</a>
+					<div class="cat-dropdown">
+						<a href="/men-tshirt.html">T-Shirts</a>
+						<a href="/men-shirt.html">Shirts</a>
+						<a href="/men-denim.html">Denim</a>
+					</div>
+				</div>
+				<div class="cat-container">
+					<a class="cat-link active" href="/women.html">Women</a>
+					<div class="cat-dropdown">
+						<a href="/women-tshirt.html">T-Shirts</a>
+						<a href="/women-hoodie.html">Hoodie</a>
+						<a href="/women-kurta.html">Kurta</a>
+						<a href="/women-denim.html">Denim</a>
+						<a href="/women-pant.html">Pant</a>
+					</div>
+				</div>
+				<div class="cat-container">
+					<a class="cat-link" href="/kids.html">Kids</a>
+					<div class="cat-dropdown">
+						<a href="/kids-boys-top.html">Boy's Top</a>
+						<a href="/kids-girls-top.html">Girl's Top</a>
+						<a href="/kids-boys-bottom.html">Boy's Bottom</a>
+						<a href="/kids-girls-bottom.html">Girl's Bottom</a>
+					</div>
+				</div>
+				<div class="cat-container">
+					<a class="cat-link" href="/footwear.html">Footwear</a>
+					<div class="cat-dropdown">
+						<a href="/footwear-mens.html">Men's Footwear</a>
+						<a href="/footwear-womens.html">Women's Footwear</a>
+						<a href="/footwear-kids.html">Kid's Footwear</a>
+					</div>
+				</div>
+			</nav>
+			<div class="search" style="max-width:420px">
+				<input id="searchInput" placeholder="Search products, brands and more" />
+			</div>
+			<div class="actions">
+				<div class="cart">
+					<button id="cartBtn">Cart 🛒</button>
+					<div id="cartBadge" class="badge" style="display:none">0</div>
+				</div>
+				<a href="#" onclick="showSignIn();return false;" style="text-decoration:none;color:var(--muted);font-size:14px">Sign in</a>
+			</div>
+		</div>
+	</header>
+
+	<main>
+		<div class="breadcrumb">
+			<a href="/">Home</a> / <a href="/women.html">Women</a> / T-Shirts
+		</div>
+
+		<section class="banner">
+			<h1>Women's T-Shirts</h1>
+			<p>Comfortable and stylish t-shirts for every day.</p>
+		</section>
+
+		<section class="container">
+			<div id="products" class="grid"></div>
+		</section>
+	</main>
+
+	<footer>
+		<div class="footer-inner">
+			<div style="color:var(--muted)">© <strong>RedStore</strong> — redstore.in</div>
+			<div style="color:var(--muted)">Support · Privacy · Terms</div>
+		</div>
+	</footer>
+
+	<script>
+		const productsData = [
+			{id:201,title:'Printed Tee',price:599,img:'https://images.unsplash.com/photo-1520975698516-6c1d6b9e2c15?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b9b6b9f9a7b',category:'women',subcategory:'tshirt'},
+			{id:202,title:'Basic Cotton Tee',price:499,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=6f3f6d4f4d4a',category:'women',subcategory:'tshirt'},
+			{id:203,title:'V-Neck Tee',price:549,img:'https://images.unsplash.com/photo-1552886905-51a12cb4c08e?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women',subcategory:'tshirt'},
+			{id:204,title:'Striped Tee',price:599,img:'https://images.unsplash.com/photo-1568762754392-b8a201f6fdc8?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women',subcategory:'tshirt'},
+			{id:205,title:'Oversized Tee',price:699,img:'https://images.unsplash.com/photo-1542805700-2f2f6b4fb6e1?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women',subcategory:'tshirt'},
+			{id:206,title:'Graphic Tee',price:649,img:'https://images.unsplash.com/photo-1503341338985-c8a05391e817?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women',subcategory:'tshirt'}
+		];
+
+		function renderProducts(list){
+			const container = document.getElementById('products');
+			container.innerHTML = '';
+			list.forEach(p=>{
+				const el = document.createElement('div'); el.className='card';
+				el.innerHTML = `
+					<img src="${p.img}" alt="${p.title}" />
+					<h3>${p.title}</h3>
+					<div class="muted">Free shipping</div>
+					<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+						<div class="price">₹${p.price}</div>
+						<div class="actions">
+							<button class="btn btn-primary" onclick="addToCart(${p.id})">Add</button>
+						</div>
+					</div>
+				`;
+				container.appendChild(el);
+			})
+		}
+
+		function addToCart(id){
+			window.addToCart(id);
+		}
+
+		document.getElementById('searchInput').addEventListener('input', (e)=>{
+			const q = e.target.value.trim().toLowerCase();
+			if(!q) renderProducts(productsData);
+			else renderProducts(productsData.filter(p=>p.title.toLowerCase().includes(q)));
+		});
+
+		renderProducts(productsData);
+
+		document.getElementById('cartBtn').addEventListener('click', ()=>{
+			window.location.href = '/cart.html';
+		});
+	</script>
+	<script src="/script.js"></script>
+</body>
+</html>

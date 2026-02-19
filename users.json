@@ -1,0 +1,17 @@
+{
+  "nextId": 3,
+  "users": {
+    "user@example.com": {
+      "id": 1,
+      "email": "user@example.com",
+      "password": "$2a$10$/jgoorSYA79OQGdfiQL2Qum808csASzDfupwM72AArj5QNwzZuEZ6",
+      "name": "Demo User"
+    },
+    "dhimantkumarswami@gmail.com": {
+      "id": 2,
+      "email": "dhimantkumarswami@gmail.com",
+      "password": "$2a$10$jJ1iaDoXSKkNdNjVuW.jru2a1E4nA/CjTVu.Ag5XwTnjXZhCHX9BS",
+      "name": "Dhimant"
+    }
+  }
+}

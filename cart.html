@@ -1,0 +1,237 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cart — RedStore</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    :root{--brand:#2874f0;--muted:#666;--card:#fff}
+    body{font-family:Inter,Segoe UI,Arial,sans-serif;background:#f1f3f6;margin:0;padding:20px}
+    .cart-shell{max-width:1200px;margin:20px auto;display:grid;grid-template-columns:1fr 360px;gap:20px}
+    .items{background:var(--card);padding:16px;border-radius:6px;border:1px solid #e6e6e9}
+    .summary{background:var(--card);padding:16px;border-radius:6px;border:1px solid #e6e6e9;height:fit-content;align-self:start;position:sticky;top:20px}
+    .item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f0f0f0}
+    .thumb{width:96px;height:96px;border-radius:6px;overflow:hidden;background:#fafafa;display:flex;align-items:center;justify-content:center;border:1px solid #f0f0f0}
+    .thumb img{width:100%;height:100%;object-fit:cover}
+    .meta{flex:1}
+    .title{font-size:15px;margin-bottom:6px}
+    .seller{color:var(--muted);font-size:13px;margin-bottom:8px}
+    .price{font-weight:700;color:#111}
+    .controls{display:flex;gap:8px;align-items:center;margin-top:10px}
+    .qty{display:inline-flex;align-items:center;border:1px solid #ddd;border-radius:4px;overflow:hidden}
+    .qty button{background:#fff;border:0;padding:6px 10px;cursor:pointer}
+    .qty input{width:48px;text-align:center;border:0}
+    .muted{color:var(--muted)}
+    .empty{padding:40px;text-align:center;color:var(--muted)}
+    .summary .row{display:flex;justify-content:space-between;padding:8px 0}
+    .checkout{background:var(--brand);color:#fff;border:0;padding:12px;border-radius:6px;width:100%;cursor:pointer}
+    @media(max-width:900px){.cart-shell{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <a href="/" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;margin-bottom:12px">
+    <div style="width:40px;height:40px;background:linear-gradient(135deg,#ff8a80,#e53935);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700">R</div>
+    <div style="line-height:1">
+      <div style="font-weight:700">RedStore</div>
+      <div style="font-size:12px;color:#666">redstore.in</div>
+    </div>
+  </a>
+
+  <div class="cart-shell">
+    <div class="items">
+      <h2 style="margin:0 0 12px">Shopping Cart</h2>
+      <div id="itemsList">Loading…</div>
+    </div>
+
+    <aside class="summary">
+      <h3 style="margin:0 0 12px">Order Summary</h3>
+      
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">Promo Code</label>
+        <div style="display:flex;gap:6px">
+          <input id="promoInput" type="text" placeholder="Enter code" style="flex:1;padding:8px;border:1px solid #e6e6e9;border-radius:4px;font-size:13px" />
+          <button onclick="applyPromo()" style="padding:8px 12px;background:var(--brand);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;font-weight:600">Apply</button>
+        </div>
+        <div id="promoMsg" style="font-size:12px;margin-top:4px"></div>
+      </div>
+      
+      <div id="summaryBody">Calculating…</div>
+      <div style="margin-top:12px"><button id="checkoutBtn" class="checkout">Place order</button></div>
+      <div style="margin-top:8px;text-align:center;font-size:13px;color:var(--muted)">Safe and secure payments</div>
+    </aside>
+  </div>
+
+  <script>
+    const productsData = [
+      {id:1,title:'Casual T-Shirt',price:499,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=6f3f6d4f4d4a'},
+      {id:2,title:'Denim Jacket',price:1999,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=6f3f6d4f4d4a'},
+      {id:3,title:'Sneakers',price:2999,img:'https://images.unsplash.com/photo-1520975698516-6c1d6b9e2c15?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b9b6b9f9a7b'},
+      {id:4,title:'Classic Watch',price:5499,img:'https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9a6b6e8a4f7c'},
+      {id:5,title:'Women Dress',price:1499,img:'https://images.unsplash.com/photo-1520975698516-6c1d6b9e2c15?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b9b6b9f9a7b'},
+      {id:6,title:'Sunglasses',price:899,img:'https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9a6b6e8a4f7c'},
+      {id:7,title:'Backpack',price:1299,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=6f3f6d4f4d4a'},
+      {id:8,title:'Running Shorts',price:599,img:'https://images.unsplash.com/photo-1520975698516-6c1d6b9e2c15?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b9b6b9f9a7b'}
+    ];
+
+    async function fetchJSON(url, opts){ const res = await fetch(url, opts); if(!res.ok) throw await res.json(); return res.json(); }
+
+    function findProduct(id){ return productsData.find(p=>p.id==id) || {img:'https://via.placeholder.com/96',title:'Product'} }
+
+    async function renderCart(){
+      const items = await fetchJSON('/api/cart');
+      const container = document.getElementById('itemsList');
+      container.innerHTML = '';
+      if(items.length===0){ container.innerHTML = '<div class="empty">Your cart is empty — <a href="/">shop now</a></div>'; document.getElementById('summaryBody').innerHTML='₹0'; return }
+
+      let subtotal = 0;
+      items.forEach(it=>{
+        const p = findProduct(it.id);
+        const div = document.createElement('div'); div.className='item';
+        div.innerHTML = `
+          <div class="thumb"><img src="${p.img}" alt="${it.title}"/></div>
+          <div class="meta">
+            <div class="title">${it.title}</div>
+            <div class="seller">Seller: <span class="muted">RedStore Retail</span></div>
+            <div class="price">₹${it.price}</div>
+            <div class="controls">
+              <div class="qty" data-id="${it.id}">
+                <button class="dec">-</button>
+                <input type="number" min="1" value="${it.qty}" />
+                <button class="inc">+</button>
+              </div>
+              <button class="remove" data-id="${it.id}" style="background:transparent;border:0;color:var(--muted);cursor:pointer">Remove</button>
+            </div>
+          </div>
+        `;
+
+        // wire qty buttons
+        div.querySelector('.dec').addEventListener('click', async ()=>{ const input = div.querySelector('input'); let v = Math.max(1, parseInt(input.value||1)-1); input.value=v; await updateQty(it.id, v); });
+        div.querySelector('.inc').addEventListener('click', async ()=>{ const input = div.querySelector('input'); let v = parseInt(input.value||1)+1; input.value=v; await updateQty(it.id, v); });
+        div.querySelector('input').addEventListener('change', async (e)=>{ const v = Math.max(1, parseInt(e.target.value||1)); e.target.value=v; await updateQty(it.id, v); });
+        div.querySelector('.remove').addEventListener('click', async ()=>{ if(!confirm('Remove this item?')) return; await fetch('/api/cart/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:it.id})}); renderCart(); });
+
+        container.appendChild(div);
+        subtotal += it.price * it.qty;
+      });
+
+      renderSummary(subtotal, items.length);
+    }
+
+    async function updateQty(id, qty){ await fetch('/api/cart/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,qty})}); await renderCart(); }
+
+    function renderSummary(subtotal, count){
+      const el = document.getElementById('summaryBody');
+      const shipping = subtotal>=999 || subtotal===0 ? 0 : 99;
+      let discount = 0;
+      
+      // Check if promo applied
+      const promoData = window.currentPromo;
+      if(promoData){
+        if(promoData.type === 'percent'){
+          discount = Math.round(subtotal * promoData.discount / 100);
+        } else {
+          discount = promoData.discount;
+        }
+      }
+      
+      const total = subtotal + shipping - discount;
+      el.innerHTML = `
+        <div class="row"><div>Price (${count} items)</div><div>₹${subtotal}</div></div>
+        <div class="row"><div>Delivery Charges</div><div>${shipping===0?'<strong style="color:green">Free</strong>':'₹'+shipping}</div></div>
+        ${discount > 0 ? `<div class="row"><div>Discount</div><div style="color:green;font-weight:700">-₹${discount}</div></div>` : ''}
+        <div class="row"><div><strong>Total</strong></div><div><strong>₹${total}</strong></div></div>
+      `;
+    }
+
+    async function applyPromo(){
+      const code = document.getElementById('promoInput').value.trim();
+      if(!code){
+        showNotification('Enter a promo code','error');
+        return;
+      }
+
+      try {
+        const promo = await fetchJSON('/api/promo/validate', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ code })
+        });
+        
+        window.currentPromo = promo;
+        document.getElementById('promoMsg').innerHTML = `<span style="color:green">✓ ${promo.code} applied!</span>`;
+        document.getElementById('promoInput').value = '';
+        renderCart();
+      } catch(err) {
+        document.getElementById('promoMsg').innerHTML = '<span style="color:red">✗ Invalid code</span>';
+      }
+    }
+
+    document.getElementById('checkoutBtn').addEventListener('click', async ()=>{
+      const items = await fetchJSON('/api/cart');
+      if(items.length===0){ showNotification('Cart is empty','error'); return; }
+      
+      let subtotal = 0;
+      items.forEach(it => subtotal += it.price * it.qty);
+      const shipping = subtotal>=999 ? 0 : 99;
+      const total = subtotal + shipping;
+      
+      try {
+        // Create payment order (amount sent in paise)
+        const orderRes = await fetchJSON('/api/payment/create-order', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ amount: total * 100, items })
+        });
+
+        // Fetch public key id from server
+        let key_id = 'rzp_test_1234567890abcd';
+        try { const keyRes = await fetchJSON('/api/payment/key'); key_id = keyRes.key_id || key_id; } catch(e){ /* ignore */ }
+
+        // Razorpay options
+        const options = {
+          key: key_id,
+          amount: orderRes.amount,
+          currency: 'INR',
+          name: 'RedStore',
+          description: `Order for ${items.length} items`,
+          order_id: orderRes.id,
+          handler: async (response) => {
+            // Verify payment on backend
+            const verifyRes = await fetchJSON('/api/payment/verify', {
+              method: 'POST',
+              headers: {'Content-Type':'application/json'},
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            });
+            
+            if(verifyRes.ok){
+              showNotification(`✓ Payment successful! Order #${verifyRes.orderId}`,'success');
+              await fetch('/api/cart/clear', {method:'POST'});
+              renderCart();
+            }
+          },
+          prefill: {
+            name: 'Customer',
+            email: 'customer@example.com'
+          },
+          theme: { color: '#2874f0' }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+      } catch(err) {
+        const details = err && (err.details || (err.error && err.error.description));
+        showNotification('Payment failed: ' + (details || err.error || err.message || 'Unknown error'),'error');
+      }
+    });
+
+    renderCart();
+  </script>
+  <script src="/script.js"></script>
+</body>
+</html>
+

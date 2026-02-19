@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Account — RedStore</title>
+  <style>body{font-family:Arial,Helvetica,sans-serif;padding:24px;background:#f7f7f8} .card{max-width:800px;margin:24px auto;background:#fff;padding:20px;border-radius:8px;border:1px solid #eee}</style>
+</head>
+<body>
+  <style>
+    :root{--brand:#2874f0;--muted:#666;--card:#fff}
+    .shell{max-width:1100px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:1fr 420px;gap:18px}
+    .account{background:var(--card);padding:20px;border-radius:8px;border:1px solid #eee}
+    .summary{background:var(--card);padding:16px;border-radius:8px;border:1px solid #eee;height:fit-content;align-self:start}
+    .item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f0}
+    .thumb{width:72px;height:72px;border-radius:6px;overflow:hidden;background:#fafafa}
+    .thumb img{width:100%;height:100%;object-fit:cover}
+    .meta{flex:1}
+    .title{font-size:15px;margin-bottom:6px}
+    .price{font-weight:700}
+    .controls{display:flex;gap:8px;align-items:center;margin-top:8px}
+    .qty button{padding:6px 8px;border-radius:4px;border:1px solid #ddd;background:#fff}
+    .small{color:var(--muted);font-size:13px}
+    @media(max-width:920px){.shell{grid-template-columns:1fr}}
+  </style>
+
+  <a href="/" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;margin-bottom:12px">
+    <div style="width:40px;height:40px;background:linear-gradient(135deg,#ff8a80,#e53935);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700">R</div>
+    <div style="line-height:1">
+      <div style="font-weight:700">RedStore</div>
+      <div style="font-size:12px;color:#666">redstore.in</div>
+    </div>
+  </a>
+
+  <div class="shell">
+    <section class="account">
+      <h2>Your account</h2>
+      <div id="userInfo">Loading…</div>
+      <div style="margin-top:12px"><button id="signoutBtn">Sign out</button></div>
+      <h3 style="margin-top:18px">Recent activity</h3>
+      <div id="activity" class="small">No recent orders (demo)</div>
+    </section>
+
+    <aside class="summary">
+      <h3 style="margin:0 0 12px">Your cart</h3>
+      <div id="cartArea">Loading…</div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <a href="/" style="flex:1;text-align:center;padding:10px;border-radius:6px;border:1px solid #ddd;text-decoration:none;color:#333">Continue shopping</a>
+        <button id="checkoutBtn" style="flex:1;background:var(--brand);color:#fff;border:0;padding:10px;border-radius:6px;cursor:pointer">Place order</button>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const productsData = [
+      {id:1,title:'Casual T-Shirt',price:499,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=6f3f6d4f4d4a'},
+      {id:2,title:'Denim Jacket',price:1999,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=6f3f6d4f4d4a'},
+      {id:3,title:'Sneakers',price:2999,img:'https://images.unsplash.com/photo-1520975698516-6c1d6b9e2c15?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b9b6b9f9a7b'},
+      {id:4,title:'Classic Watch',price:5499,img:'https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9a6b6e8a4f7c'}
+    ];
+
+    async function fetchJSON(url, opts){ const res = await fetch(url, opts); if(!res.ok) throw await res.json(); return res.json(); }
+
+    function findProduct(id){ return productsData.find(p=>p.id==id) || {img:'https://via.placeholder.com/72',title:'Product'} }
+
+    async function loadAccount(){
+      try{
+        const { user } = await fetchJSON('/api/account');
+        document.getElementById('userInfo').innerHTML = `<strong>${user.name}</strong><br/>${user.email}`;
+      }catch(err){ window.location.href = '/signin.html' }
+    }
+
+    async function renderCart(){
+      const items = await fetchJSON('/api/cart');
+      const area = document.getElementById('cartArea');
+      if(items.length===0){ area.innerHTML='<div class="small">Cart is empty. <a href="/">Shop now</a></div>'; return }
+      area.innerHTML = '';
+      let subtotal = 0;
+      items.forEach(it=>{
+        const p = findProduct(it.id);
+        const row = document.createElement('div'); row.className='item';
+        row.innerHTML = `<div class="thumb"><img src="${p.img}"/></div><div class="meta"><div class="title">${it.title}</div><div class="small">Seller: RedStore Retail</div><div class="price">₹${it.price}</div><div class="controls"><div class="qty"><button class="dec">-</button><input type="number" value="${it.qty}" style="width:48px;text-align:center"/><button class="inc">+</button></div><button class="remove" style="background:transparent;border:0;color:var(--muted);cursor:pointer;margin-left:8px">Remove</button></div></div>`;
+        row.querySelector('.dec').addEventListener('click', async ()=>{ const input = row.querySelector('input'); let v = Math.max(1, parseInt(input.value||1)-1); input.value=v; await updateQty(it.id,v); });
+        row.querySelector('.inc').addEventListener('click', async ()=>{ const input = row.querySelector('input'); let v = parseInt(input.value||1)+1; input.value=v; await updateQty(it.id,v); });
+        row.querySelector('input').addEventListener('change', async (e)=>{ const v = Math.max(1, parseInt(e.target.value||1)); e.target.value=v; await updateQty(it.id,v); });
+        row.querySelector('.remove').addEventListener('click', async ()=>{ if(!confirm('Remove this item?')) return; await fetch('/api/cart/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:it.id})}); renderCart(); });
+        area.appendChild(row);
+        subtotal += it.price * it.qty;
+      });
+      const foot = document.createElement('div'); foot.style.paddingTop='12px'; foot.innerHTML = `<div class="small">Subtotal</div><div style="font-weight:700">₹${subtotal}</div>`; area.appendChild(foot);
+    }
+
+    async function updateQty(id, qty){ await fetch('/api/cart/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,qty})}); await renderCart(); }
+
+    document.getElementById('signoutBtn').addEventListener('click', async ()=>{ await fetch('/api/signout',{method:'POST'}); window.location.href='/signin.html'; });
+    document.getElementById('checkoutBtn').addEventListener('click', async ()=>{ if(!confirm('Place order and clear cart?')) return; await fetch('/api/cart/clear',{method:'POST'}); showNotification('Order placed (demo)','success'); renderCart(); });
+
+    loadAccount(); renderCart();
+  </script>
+  <script src="/script.js"></script>
+</body>
+</html>

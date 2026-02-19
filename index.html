@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>RedStore — Online Shopping</title>
+	<meta name="description" content="RedStore: Trendy fashion, accessories and more — shop the latest collections." />
+	<style>
+		:root{--red:#e53935;--dark:#222;--muted:#666;--bg:#f7f7f8;--card:#fff}
+		*{box-sizing:border-box}
+		body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0;background:var(--bg);color:var(--dark)}
+		header{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:20}
+		.topbar{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+		.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--dark)}
+		.logo{width:40px;height:40px;background:linear-gradient(135deg,#ff8a80,var(--red));border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+		nav{display:flex;gap:14px;align-items:center}
+		nav a{color:var(--muted);text-decoration:none;font-size:14px}
+		nav .cat-link{padding:8px 12px;border-radius:6px;transition:all 0.2s}
+		nav .cat-link:hover{background:#f5f5f5;color:var(--dark)}
+		.cat-container{position:relative;padding-bottom:12px}
+		.cat-dropdown{position:absolute;top:calc(100% + 8px);left:0;background:#fff;border:1px solid #eee;border-radius:8px;min-width:180px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:100;pointer-events:auto;opacity:0;visibility:hidden;transition:opacity 0.2s, visibility 0.2s}
+		.cat-container:hover .cat-dropdown{opacity:1;visibility:visible}
+		.cat-dropdown a{display:block;padding:10px 16px;color:var(--muted);text-decoration:none;border-bottom:1px solid #f5f5f5;font-size:14px;pointer-events:auto}
+		.cat-dropdown a:last-child{border-bottom:none}
+		.cat-dropdown a:hover{background:var(--red);color:#fff}
+		.search{flex:1;margin:0 18px}
+		.search input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #e6e6e6}
+		.actions{display:flex;gap:12px;align-items:center}
+		.cart{position:relative}
+		.cart button{background:transparent;border:1px solid #eee;padding:8px 10px;border-radius:8px;cursor:pointer}
+		.badge{position:absolute;right:0;top:-6px;background:var(--red);color:#fff;border-radius:999px;padding:2px 6px;font-size:12px}
+		.action-link{text-decoration:none;color:var(--muted);font-size:14px;cursor:pointer}
+		.action-link:hover{color:var(--red)}
+
+		.hero{max-width:1100px;margin:18px auto;padding:20px;background:linear-gradient(90deg,#fff, #fff);display:grid;grid-template-columns:1fr 360px;gap:18px}
+		.hero-left{background:var(--card);padding:28px;border-radius:12px;display:flex;flex-direction:column;justify-content:center}
+		.hero-left h1{margin:0 0 8px;font-size:28px;color:var(--dark)}
+		.hero-left p{margin:0 0 16px;color:var(--muted)}
+		.cta{background:var(--red);color:#fff;padding:12px 16px;border-radius:10px;border:none;cursor:pointer}
+		.hero-right{background:linear-gradient(135deg,#fff,#fff);padding:12px;border-radius:12px;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center}
+
+		.container{max-width:1100px;margin:18px auto;padding:0 16px}
+		.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+		.card{background:var(--card);border-radius:12px;padding:12px;border:1px solid #eee;transition:transform 0.2s,box-shadow 0.2s}
+		.card:hover{transform:translateY(-4px);box-shadow:0 8px 16px rgba(0,0,0,0.1)}
+		.card img{width:100%;height:200px;object-fit:cover;border-radius:8px}
+		.card h3{margin:10px 0 6px;font-size:16px}
+		.price{font-weight:700;color:var(--dark)}
+		.muted{color:var(--muted);font-size:13px}
+		.card .actions{margin-top:10px}
+		.btn{padding:8px 10px;border-radius:8px;border:none;cursor:pointer}
+		.btn-primary{background:var(--red);color:#fff}
+		.btn-outline{background:transparent;border:1px solid #ddd}
+
+		footer{margin-top:28px;padding:28px 0;background:#fff;border-top:1px solid #eee}
+		.footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:0 16px}
+
+		@media (max-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}}
+		@media (max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.search{display:none}.topbar{padding:10px}.hero{padding:12px}}
+		@media (max-width:420px){.grid{grid-template-columns:1fr}.brand span{display:none}}
+	</style>
+</head>
+<body>
+	<header>
+		<div class="topbar">
+			<a class="brand" href="/">
+				<div class="logo">R</div>
+				<div>
+					<div style="font-weight:700">RedStore</div>
+					<div style="font-size:12px;color:var(--muted)">redstore.in</div>
+				</div>
+			</a>
+			<nav>
+				<div class="cat-container">
+					<a class="cat-link" href="/men.html">Men</a>
+					<div class="cat-dropdown">
+						<a href="/men-tshirt.html">T-Shirts</a>
+						<a href="/men-shirt.html">Shirts</a>
+						<a href="/men-denim.html">Denim</a>
+					</div>
+				</div>
+				<div class="cat-container">
+					<a class="cat-link" href="/women.html">Women</a>
+					<div class="cat-dropdown">
+						<a href="/women-tshirt.html">T-Shirts</a>
+						<a href="/women-hoodie.html">Hoodie</a>
+						<a href="/women-kurta.html">Kurta</a>
+						<a href="/women-denim.html">Denim</a>
+						<a href="/women-pant.html">Pant</a>
+					</div>
+				</div>
+				<div class="cat-container">
+					<a class="cat-link" href="/kids.html">Kids</a>
+					<div class="cat-dropdown">
+						<a href="/kids-boys-top.html">Boy's Top</a>
+						<a href="/kids-girls-top.html">Girl's Top</a>
+						<a href="/kids-boys-bottom.html">Boy's Bottom</a>
+						<a href="/kids-girls-bottom.html">Girl's Bottom</a>
+					</div>
+				</div>
+				<div class="cat-container">
+					<a class="cat-link" href="/footwear.html">Footwear</a>
+					<div class="cat-dropdown">
+						<a href="/footwear-mens.html">Men's Footwear</a>
+						<a href="/footwear-womens.html">Women's Footwear</a>
+						<a href="/footwear-kids.html">Kid's Footwear</a>
+					</div>
+				</div>
+			</nav>
+			<div class="search" style="max-width:420px">
+				<input id="searchInput" placeholder="Search products, brands and more" />
+			</div>
+			<div class="actions">
+				<div class="cart">
+					<button id="cartBtn">Cart 🛒</button>
+					<div id="cartBadge" class="badge" style="display:none">0</div>
+				</div>
+				<a href="/wishlist.html" class="action-link">♥ Wishlist</a>
+				<a href="/orders.html" class="action-link">📦 Orders</a>
+				<a href="#" onclick="showSignIn();return false;" class="action-link" id="signinLink">Sign in</a>
+				<button id="darkModeBtn" class="action-link" style="background:none;border:none;cursor:pointer;padding:0;font-size:18px" title="Toggle dark mode">🌙</button>
+			</div>
+		</div>
+	</header>
+
+	<main>
+		<section class="hero">
+			<div class="hero-left">
+				<h1>Spring Sale — Up to 50% off</h1>
+				<p>Discover trending styles, exclusive drops and best sellers. Free shipping on orders over ₹999.</p>
+				<div style="display:flex;gap:10px">
+					<button class="cta" onclick="scrollToProducts()">Shop Now</button>
+					<button class="btn btn-outline">New Arrivals</button>
+				</div>
+			</div>
+			<div class="hero-right">
+				<img src="https://images.unsplash.com/photo-1520975698516-6c1d6b9e2c15?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b9b6b9f9a7b" alt="promo" style="width:100%;border-radius:8px;max-height:260px;object-fit:cover" />
+			</div>
+		</section>
+
+		<section class="container">
+			<h2 style="margin:6px 0 12px">Featured Products</h2>
+			<div id="products" class="grid"></div>
+		</section>
+	</main>
+
+	<footer>
+		<div class="footer-inner">
+			<div style="color:var(--muted)">© <strong>RedStore</strong> — redstore.in</div>
+			<div style="color:var(--muted)">Support · Privacy · Terms</div>
+		</div>
+	</footer>
+
+	<script>
+		const productsData = [
+			// Men
+			{id:1,title:'Casual T-Shirt',price:499,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=6f3f6d4f4d4a',category:'men'},
+			{id:2,title:'Denim Jacket',price:1999,img:'https://images.unsplash.com/photo-1551028719-00167b16ebc5?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'men'},
+			{id:3,title:'Formal Shirt',price:899,img:'https://images.unsplash.com/photo-1577720643272-265a86e59c6b?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'men'},
+			{id:4,title:'Chino Pants',price:1299,img:'https://images.unsplash.com/photo-1548546682-c6dde2316e42?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'men'},
+			{id:5,title:'Polo Shirt',price:799,img:'https://images.unsplash.com/photo-1538685895594-da1b2e36c83e?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'men'},
+			{id:6,title:'Hoodie',price:1599,img:'https://images.unsplash.com/photo-1556821552-5b5b3efeae34?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'men'},
+			// Women
+			{id:7,title:'Women Dress',price:1499,img:'https://images.unsplash.com/photo-1595777721973-630b3203a5a6?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women'},
+			{id:8,title:'Blouse',price:899,img:'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women'},
+			{id:9,title:'Saree',price:1999,img:'https://images.unsplash.com/photo-1608411267207-a1a60e47f0d5?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women'},
+			{id:10,title:'Jeans',price:1299,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women'},
+			{id:11,title:'Lehenga',price:2499,img:'https://images.unsplash.com/photo-1583391733968-72097f5f0f0f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women'},
+			{id:12,title:'Tops',price:699,img:'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women'},
+			// Kids
+			{id:13,title:'Kids T-Shirt',price:399,img:'https://images.unsplash.com/photo-1627074827782-f1a5eb146f9f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'kids'},
+			{id:14,title:'Kids Shorts',price:499,img:'https://images.unsplash.com/photo-1612127419326-4f6da2c72ff1?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'kids'},
+			{id:15,title:'Kids Dress',price:799,img:'https://images.unsplash.com/photo-1615252888930-d29eaeac4e97?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'kids'},
+			{id:16,title:'Kids Shoes',price:999,img:'https://images.unsplash.com/photo-1606992396889-7f6f9c4e6f35?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'kids'},
+			{id:17,title:'Kids Jacket',price:1199,img:'https://images.unsplash.com/photo-1617298317033-1eb92e670e1d?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'kids'},
+			{id:18,title:'Kids Cap',price:299,img:'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'kids'},
+			// Footwear
+			{id:19,title:'Sneakers',price:2999,img:'https://images.unsplash.com/photo-1520975698516-6c1d6b9e2c15?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b9b6b9f9a7b',category:'footwear'},
+			{id:20,title:'Running Shoes',price:3499,img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'footwear'},
+			{id:21,title:'Casual Loafers',price:1999,img:'https://images.unsplash.com/photo-1548062016-76a7e6b33e3b?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'footwear'},
+			{id:22,title:'Formal Shoes',price:2499,img:'https://images.unsplash.com/photo-1506361197048-46a149213204?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'footwear'},
+			{id:23,title:'Boots',price:3999,img:'https://images.unsplash.com/photo-1554707232-cb63aea249df?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'footwear'},
+			{id:24,title:'Sandals',price:899,img:'https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'footwear'},
+			// Accessories
+			{id:25,title:'Classic Watch',price:5499,img:'https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9a6b6e8a4f7c',category:'accessories'},
+			{id:26,title:'Sunglasses',price:899,img:'https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9a6b6e8a4f7c',category:'accessories'},
+			{id:27,title:'Backpack',price:1299,img:'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'accessories'},
+			{id:28,title:'Belt',price:599,img:'https://images.unsplash.com/photo-1598461625169-a9ad1a0247f3?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'accessories'}
+		];
+
+		const cart = new Map();
+
+		function renderProducts(list){
+			const container = document.getElementById('products');
+			container.innerHTML = '';
+			list.forEach(p=>{
+				const el = document.createElement('div'); el.className='card';
+				el.innerHTML = `
+					<img src="${p.img}" alt="${p.title}" />
+					<h3>${p.title}</h3>
+					<div class="muted">Best seller</div>
+					<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+						<div class="price">₹${p.price}</div>
+						<div class="actions">
+							<button class="btn btn-outline" onclick="view(${p.id})">View</button>
+							<button class="btn btn-primary" onclick="addToCart(${p.id})">Add</button>
+						</div>
+					</div>
+				`;
+				container.appendChild(el);
+			})
+		}
+
+		function addToCart(id){
+			const qty = cart.get(id) || 0; cart.set(id, qty+1); updateCartBadge();
+					showNotification('Added to cart');
+		}
+		function updateCartBadge(){
+			const total = Array.from(cart.values()).reduce((a,b)=>a+b,0);
+			const badge = document.getElementById('cartBadge');
+			if(total>0){ badge.style.display='block'; badge.textContent=total } else badge.style.display='none';
+		}
+		function view(id){
+			const p = productsData.find(x=>x.id===id);
+					showNotification(p.title + ' — ₹' + p.price);
+		}
+		function scrollToProducts(){ document.getElementById('products').scrollIntoView({behavior:'smooth'}) }
+
+		// Simple search
+		document.getElementById('searchInput').addEventListener('input', (e)=>{
+			const q = e.target.value.trim().toLowerCase();
+			if(!q) renderProducts(productsData);
+			else renderProducts(productsData.filter(p=>p.title.toLowerCase().includes(q)));
+		});
+
+		// initial render
+		renderProducts(productsData);
+
+		// Wire cart button to show simple cart summary
+		document.getElementById('cartBtn').addEventListener('click', ()=>{
+			window.location.href = '/cart.html';
+		});
+
+		// Dark mode toggle
+		const darkModeBtn = document.getElementById('darkModeBtn');
+		const isDarkMode = localStorage.getItem('darkMode') === 'true';
+		if(isDarkMode) document.body.style.filter = 'invert(1) hue-rotate(180deg)';
+		darkModeBtn.addEventListener('click', (e)=>{
+			e.preventDefault();
+			const current = localStorage.getItem('darkMode') === 'true';
+			localStorage.setItem('darkMode', !current);
+			document.body.style.filter = !current ? 'none' : 'invert(1) hue-rotate(180deg)';
+		});
+
+		// View product detail
+		window.view = function(id){
+			window.location.href = '/product-detail.html?id=' + id;
+		};
+	</script>
+	<script src="/script.js"></script>
+	</body>
+	</html>

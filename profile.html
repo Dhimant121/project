@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Profile — RedStore</title>
+  <style>
+    :root{--brand:#2874f0;--muted:#666;--card:#fff;--dark:#111}
+    body{font-family:Inter,Segoe UI,Arial,sans-serif;background:#f1f3f6;margin:0;padding:20px}
+    .container{max-width:1000px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+    h1{margin:0;font-size:24px}
+    .nav-link{color:var(--brand);text-decoration:none;padding:8px 12px;border-radius:6px}
+    .nav-link:hover{background:#f0f7ff}
+    .section{background:var(--card);border:1px solid #e6e6e9;border-radius:6px;padding:20px;margin-bottom:20px}
+    .section h2{margin:0 0 16px;font-size:18px;border-bottom:1px solid #f0f0f0;padding-bottom:12px}
+    .field{margin-bottom:16px}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
+    input, textarea{width:100%;padding:10px;border:1px solid #e6e6e9;border-radius:6px;font-family:inherit;font-size:14px}
+    input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 2px rgba(40, 116, 240, 0.1)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .btn{padding:10px 16px;border-radius:6px;border:none;background:var(--brand);color:#fff;cursor:pointer;font-size:14px;font-weight:600}
+    .btn:hover{opacity:0.9}
+    .btn-secondary{background:#f0f0f0;color:var(--dark);border:1px solid #e6e6e9}
+    .address-card{background:#f9f9f9;border:1px solid #e6e6e9;border-radius:6px;padding:12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:start}
+    .address-info{flex:1}
+    .address-info p{margin:4px 0;font-size:13px}
+    .address-info strong{display:block;margin-bottom:6px}
+    .btn-remove{background:#f44336;color:#fff;padding:6px 10px;border:none;border-radius:4px;cursor:pointer;font-size:12px}
+    .dark-mode-toggle{display:flex;align-items:center;gap:12px}
+    .toggle-switch{width:50px;height:26px;background:#ddd;border-radius:13px;position:relative;cursor:pointer}
+    .toggle-switch.active{background:var(--brand)}
+    .toggle-switch span{width:24px;height:24px;background:#fff;border-radius:50%;position:absolute;top:1px;left:1px;transition:left 0.2s}
+    .toggle-switch.active span{left:23px}
+    @media(max-width:700px){.row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>My Profile</h1>
+      <div style="display:flex;gap:12px">
+        <a href="/orders.html" class="nav-link">Orders</a>
+        <a href="/wishlist.html" class="nav-link">Wishlist</a>
+        <a href="/" class="nav-link">Shop</a>
+      </div>
+    </header>
+
+    <div class="section">
+      <h2>Account Settings</h2>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" readonly style="background:#f9f9f9;color:var(--muted)" />
+      </div>
+      <div class="field">
+        <label>Name</label>
+        <input type="text" id="name" placeholder="Your name" />
+      </div>
+      <div class="field">
+        <label>Phone</label>
+        <input type="tel" id="phone" placeholder="Your phone number" />
+      </div>
+      <div class="field">
+        <label>Dark Mode</label>
+        <div class="dark-mode-toggle">
+          <div id="darkModeToggle" class="toggle-switch">
+            <span></span>
+          </div>
+          <span id="darkModeLabel">Off</span>
+        </div>
+      </div>
+      <button class="btn" onclick="saveSettings()">Save Changes</button>
+    </div>
+
+    <div class="section">
+      <h2>Saved Addresses</h2>
+      <div id="addressesList"></div>
+      <button class="btn" onclick="showAddressForm()">Add New Address</button>
+      
+      <div id="addressForm" style="display:none;margin-top:20px;padding-top:20px;border-top:1px solid #e6e6e9">
+        <h3 style="margin:0 0 16px;font-size:16px">Add Address</h3>
+        <div class="row">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" id="addr_name" placeholder="Name" />
+          </div>
+          <div class="field">
+            <label>Phone</label>
+            <input type="tel" id="addr_phone" placeholder="Phone" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Street Address</label>
+          <input type="text" id="addr_street" placeholder="Street address" />
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>City</label>
+            <input type="text" id="addr_city" placeholder="City" />
+          </div>
+          <div class="field">
+            <label>State</label>
+            <input type="text" id="addr_state" placeholder="State" />
+          </div>
+        </div>
+        <div class="field">
+          <label>ZIP Code</label>
+          <input type="text" id="addr_zip" placeholder="ZIP" />
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" onclick="saveAddress()">Save Address</button>
+          <button class="btn btn-secondary" onclick="hideAddressForm()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function fetchJSON(url, opts){ const res = await fetch(url, opts); if(!res.ok) throw await res.json(); return res.json(); }
+
+    async function loadProfile(){
+      try {
+        const account = await fetchJSON('/api/account');
+        document.getElementById('email').value = account.user.email;
+        document.getElementById('name').value = account.user.name || '';
+        document.getElementById('phone').value = account.user.phone || '';
+        
+        // Dark mode toggle
+        const toggle = document.getElementById('darkModeToggle');
+        const label = document.getElementById('darkModeLabel');
+        if(account.user.darkMode){
+          toggle.classList.add('active');
+          label.textContent = 'On';
+        }
+        toggle.addEventListener('click', () => {
+          toggle.classList.toggle('active');
+          label.textContent = toggle.classList.contains('active') ? 'On' : 'Off';
+        });
+
+        // Load addresses
+        loadAddresses();
+      } catch(err) {
+        showNotification('Failed to load profile','error');
+      }
+    }
+
+    async function loadAddresses(){
+      try {
+        const addresses = await fetchJSON('/api/user/addresses');
+        const container = document.getElementById('addressesList');
+        
+        if(addresses.length === 0){
+          container.innerHTML = '<p style="color:var(--muted);font-size:13px">No saved addresses</p>';
+          return;
+        }
+
+        container.innerHTML = '';
+        addresses.forEach(addr => {
+          const card = document.createElement('div');
+          card.className = 'address-card';
+          card.innerHTML = `
+            <div class="address-info">
+              <strong>${addr.name}</strong>
+              <p>${addr.street}, ${addr.city}, ${addr.state} ${addr.zip}</p>
+              <p>Phone: ${addr.phone}</p>
+            </div>
+            <button class="btn-remove" onclick="deleteAddress(${addr.id})">Remove</button>
+          `;
+          container.appendChild(card);
+        });
+      } catch(err) {
+        console.error(err);
+      }
+    }
+
+    async function saveAddress(){
+      const name = document.getElementById('addr_name').value;
+      const phone = document.getElementById('addr_phone').value;
+      const street = document.getElementById('addr_street').value;
+      const city = document.getElementById('addr_city').value;
+      const state = document.getElementById('addr_state').value;
+      const zip = document.getElementById('addr_zip').value;
+
+      if(!name || !phone || !street || !city || !state || !zip){
+        showNotification('Please fill all fields','error');
+        return;
+      }
+
+      try {
+        await fetchJSON('/api/user/address/add', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ name, phone, street, city, state, zip })
+        });
+        hideAddressForm();
+        loadAddresses();
+      } catch(err) {
+        showNotification('Failed to save address','error');
+      }
+    }
+
+    async function deleteAddress(id){
+      if(!confirm('Remove this address?')) return;
+      try {
+        await fetchJSON('/api/user/address/delete', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ addressId: id })
+        });
+        loadAddresses();
+      } catch(err) {
+        showNotification('Failed to delete address','error');
+      }
+    }
+
+    async function saveSettings(){
+      const phone = document.getElementById('phone').value;
+      const darkMode = document.getElementById('darkModeToggle').classList.contains('active');
+
+      try {
+        await fetchJSON('/api/user/settings', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ phone, darkMode })
+        });
+        showNotification('Settings saved!', 'success');
+      } catch(err) {
+        showNotification('Failed to save settings','error');
+      }
+    }
+
+    function showAddressForm(){
+      document.getElementById('addressForm').style.display = 'block';
+    }
+
+    function hideAddressForm(){
+      document.getElementById('addressForm').style.display = 'none';
+      document.getElementById('addr_name').value = '';
+      document.getElementById('addr_phone').value = '';
+      document.getElementById('addr_street').value = '';
+      document.getElementById('addr_city').value = '';
+      document.getElementById('addr_state').value = '';
+      document.getElementById('addr_zip').value = '';
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>

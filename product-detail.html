@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Product Detail — RedStore</title>
+  <style>
+    :root{--brand:#2874f0;--muted:#666;--card:#fff;--dark:#111;--bg:#f1f3f6}
+    body{font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);margin:0;padding:20px}
+    .container{max-width:1000px;margin:0 auto}
+    .breadcrumb{color:var(--muted);font-size:13px;margin-bottom:20px}
+    .breadcrumb a{color:var(--brand);text-decoration:none}
+    .product-section{display:grid;grid-template-columns:1fr 1fr;gap:24px;background:var(--card);padding:24px;border-radius:6px;margin-bottom:20px}
+    .product-image{width:100%;height:400px;object-fit:cover;background:#f9f9f9;border-radius:6px;border:1px solid #e6e6e9}
+    .product-info h1{margin:0 0 8px;font-size:24px;color:var(--dark)}
+    .product-meta{color:var(--muted);font-size:13px;margin-bottom:12px}
+    .rating{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+    .stars{color:#ffc107;font-size:14px}
+    .price{font-size:24px;color:var(--dark);font-weight:700;margin-bottom:12px}
+    .section-title{font-size:14px;font-weight:600;color:var(--muted);margin-top:16px;margin-bottom:8px}
+    .description{color:var(--muted);font-size:14px;line-height:1.6}
+    .actions{display:flex;gap:8px;margin-top:20px}
+    .btn{padding:10px 16px;border-radius:6px;border:none;background:var(--brand);color:#fff;cursor:pointer;font-size:14px;font-weight:600;flex:1}
+    .btn:hover{opacity:0.9}
+    .btn-secondary{background:#f0f0f0;color:var(--dark);border:1px solid #e6e6e9;font-weight:600}
+    .btn-wishlist{background:transparent;border:1px solid var(--brand);color:var(--brand);padding:10px}
+    .reviews-section{background:var(--card);padding:24px;border-radius:6px;margin-bottom:20px}
+    .reviews-section h2{margin:0 0 20px;font-size:18px;border-bottom:1px solid #f0f0f0;padding-bottom:12px}
+    .review-card{border-bottom:1px solid #f0f0f0;padding:16px 0}
+    .review-card:last-child{border-bottom:none}
+    .review-header{display:flex;justify-content:space-between;margin-bottom:8px}
+    .review-author{font-weight:600;color:var(--dark)}
+    .review-rating{color:#ffc107;font-size:14px}
+    .review-date{color:var(--muted);font-size:12px}
+    .review-title{font-weight:600;margin-bottom:6px}
+    .review-text{color:var(--muted);font-size:14px;line-height:1.6}
+    .review-form{background:#f9f9f9;padding:16px;border-radius:6px;margin-bottom:20px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    input, textarea{width:100%;padding:10px;border:1px solid #e6e6e9;border-radius:6px;font-family:inherit;font-size:14px}
+    input:focus, textarea:focus{outline:none;border-color:var(--brand)}
+    .rating-select{display:flex;gap:8px;margin-bottom:12px}
+    .rating-select label{cursor:pointer;display:flex;align-items:center;gap:4px}
+    .rating-select input[type="radio"]{margin:0}
+    @media(max-width:700px){.product-section{grid-template-columns:1fr}.actions{flex-direction:column}.form-row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="/">Home</a> / <span id="productCat">Product</span> / <span id="productTitle">Loading...</span>
+    </div>
+
+    <div class="product-section">
+      <div>
+        <img id="productImage" src="" alt="" class="product-image" />
+      </div>
+      <div class="product-info">
+        <h1 id="productName">Loading...</h1>
+        <div class="product-meta">Free shipping on orders above ₹999</div>
+        
+        <div class="rating">
+          <span class="stars" id="avgRating">★★★★★</span>
+          <span id="reviewCount">(0 reviews)</span>
+        </div>
+
+        <div class="price">₹<span id="productPrice">0</span></div>
+
+        <div>
+          <div class="section-title">Quantity</div>
+          <input type="number" id="qty" min="1" max="10" value="1" style="width:80px" />
+        </div>
+
+        <div>
+          <div class="section-title">Description</div>
+          <p class="description" id="productDesc">Loading description...</p>
+        </div>
+
+        <div class="actions">
+          <button class="btn" onclick="addToCart()">🛒 Add to Cart</button>
+          <button class="btn btn-secondary btn-wishlist" id="wishlistBtn" onclick="toggleWishlist()">♥ Wishlist</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="reviews-section">
+      <h2>Customer Reviews</h2>
+
+      <div class="review-form">
+        <h3 style="margin:0 0 12px">Write a Review</h3>
+        <div class="rating-select">
+          <label><input type="radio" name="rating" value="5" checked> ★★★★★ Excellent</label>
+          <label><input type="radio" name="rating" value="4"> ★★★★☆ Good</label>
+          <label><input type="radio" name="rating" value="3"> ★★★☆☆ Average</label>
+        </div>
+        <div class="form-row">
+          <input type="text" id="reviewTitle" placeholder="Review title" />
+          <input type="email" id="reviewEmail" placeholder="Your email" readonly />
+        </div>
+        <textarea id="reviewText" placeholder="Write your review..." rows="4"></textarea>
+        <button class="btn" style="margin-top:12px;width:150px" onclick="submitReview()">Post Review</button>
+      </div>
+
+      <div id="reviewsList">No reviews yet</div>
+    </div>
+  </div>
+
+  <script>
+    let productId = new URLSearchParams(window.location.search).get('id') || 1;
+    
+    async function fetchJSON(url, opts){ const res = await fetch(url, opts); if(!res.ok) throw await res.json(); return res.json(); }
+
+    async function loadProduct(){
+      // In a real app, fetch from backend
+      const products = {
+        1: {title:'Casual T-Shirt',price:499,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800',cat:'Men',desc:'High-quality cotton t-shirt, perfect for everyday wear.'},
+        2: {title:'Denim Jacket',price:1999,img:'https://images.unsplash.com/photo-1551028719-00167b16ebc5?q=80&w=800',cat:'Men',desc:'Classic denim jacket for all seasons.'},
+        3: {title:'Women Dress',price:1499,img:'https://images.unsplash.com/photo-1595777707802-21b350ed2b3f?q=80&w=800',cat:'Women',desc:'Elegant dress perfect for any occasion.'},
+      };
+
+      const p = products[productId] || products[1];
+      document.getElementById('productName').textContent = p.title;
+      document.getElementById('productTitle').textContent = p.title;
+      document.getElementById('productCat').textContent = p.cat;
+      document.getElementById('productImage').src = p.img;
+      document.getElementById('productPrice').textContent = p.price;
+      document.getElementById('productDesc').textContent = p.desc;
+
+      // Get email if logged in
+      try {
+        const account = await fetchJSON('/api/account');
+        document.getElementById('reviewEmail').value = account.user.email;
+      } catch(e) {}
+
+      loadReviews();
+      checkWishlist();
+    }
+
+    async function loadReviews(){
+      try {
+        const reviews = await fetchJSON('/api/reviews/' + productId);
+        const container = document.getElementById('reviewsList');
+        
+        if(reviews.length === 0){
+          container.innerHTML = '<p style="color:var(--muted)">No reviews yet. Be the first to review!</p>';
+          document.getElementById('reviewCount').textContent = '(0 reviews)';
+          document.getElementById('avgRating').textContent = 'No rating yet';
+          return;
+        }
+
+        const avgRating = reviews.reduce((s, r) => s + r.rating, 0) / reviews.length;
+        const stars = '★'.repeat(Math.round(avgRating)) + '☆'.repeat(5 - Math.round(avgRating));
+        document.getElementById('avgRating').textContent = stars;
+        document.getElementById('reviewCount').textContent = `(${reviews.length} reviews)`;
+
+        container.innerHTML = '';
+        reviews.forEach(review => {
+          const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+          const date = new Date(review.createdAt).toLocaleDateString('en-IN');
+          const card = document.createElement('div');
+          card.className = 'review-card';
+          card.innerHTML = `
+            <div class="review-header">
+              <div>
+                <div class="review-author">${review.userName}</div>
+                <div class="review-rating">${stars}</div>
+              </div>
+              <div class="review-date">${date}</div>
+            </div>
+            <div class="review-title">${review.title}</div>
+            <div class="review-text">${review.comment}</div>
+          `;
+          container.appendChild(card);
+        });
+      } catch(err) {
+        console.error(err);
+      }
+    }
+
+    async function submitReview(){
+      const rating = document.querySelector('input[name="rating"]:checked').value;
+      const title = document.getElementById('reviewTitle').value;
+      const comment = document.getElementById('reviewText').value;
+
+      if(!title || !comment){
+        showNotification('Please fill all fields','error');
+        return;
+      }
+
+      try {
+        await fetchJSON('/api/reviews/add', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ productId, title, rating, comment })
+        });
+        document.getElementById('reviewTitle').value = '';
+        document.getElementById('reviewText').value = '';
+        showNotification('Review posted!','success');
+        loadReviews();
+      } catch(err) {
+        showNotification('Please sign in to post a review','error');
+      }
+    }
+
+    async function checkWishlist(){
+      try {
+        const wishlist = await fetchJSON('/api/wishlist');
+        if(wishlist.find(p => p.id == productId)){
+          document.getElementById('wishlistBtn').textContent = '♥ In Wishlist';
+          document.getElementById('wishlistBtn').style.color = '#ff6b6b';
+        }
+      } catch(e) {}
+    }
+
+    async function toggleWishlist(){
+      try {
+        const price = document.getElementById('productPrice').textContent;
+        const title = document.getElementById('productName').textContent;
+        const img = document.getElementById('productImage').src;
+        
+        await fetchJSON('/api/wishlist/add', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ id: parseInt(productId), title, price: parseInt(price), img })
+        });
+        checkWishlist();
+      } catch(err) {
+        showNotification(err.error || 'Failed to add to wishlist','error');
+      }
+    }
+
+    function addToCart(){
+      const qty = parseInt(document.getElementById('qty').value);
+      window.addToCart(parseInt(productId));
+    }
+
+    loadProduct();
+  </script>
+  <script src="/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Wishlist — RedStore</title>
+  <style>
+    :root{--brand:#2874f0;--muted:#666;--card:#fff;--dark:#111;--bg:#f1f3f6}
+    body{font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);margin:0;padding:20px}
+    .container{max-width:1000px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+    h1{margin:0;font-size:24px}
+    .nav-link{color:var(--brand);text-decoration:none;padding:8px 12px;border-radius:6px}
+    .nav-link:hover{background:#f0f7ff}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    .product-card{background:var(--card);border:1px solid #e6e6e9;border-radius:6px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s}
+    .product-card:hover{transform:translateY(-4px);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+    .product-img{width:100%;height:160px;object-fit:cover;background:#f9f9f9}
+    .product-info{padding:12px}
+    .product-title{font-size:14px;font-weight:600;margin-bottom:6px}
+    .product-price{font-size:16px;color:var(--dark);font-weight:700;margin-bottom:12px}
+    .btn{padding:8px 12px;border-radius:6px;border:none;background:var(--brand);color:#fff;cursor:pointer;font-size:13px;font-weight:600;width:100%}
+    .btn:hover{opacity:0.9}
+    .btn-danger{background:#f44336}
+    .empty{text-align:center;padding:40px;color:var(--muted);background:var(--card);border-radius:6px}
+    .empty a{color:var(--brand);text-decoration:none}
+    @media(max-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:420px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>My Wishlist</h1>
+      <div style="display:flex;gap:12px">
+        <a href="/profile.html" class="nav-link">Profile</a>
+        <a href="/orders.html" class="nav-link">Orders</a>
+        <a href="/" class="nav-link">Shop</a>
+      </div>
+    </header>
+
+    <div id="wishlistContainer" class="grid"></div>
+  </div>
+
+  <script>
+    async function fetchJSON(url, opts){ const res = await fetch(url, opts); if(!res.ok) throw await res.json(); return res.json(); }
+
+    async function loadWishlist(){
+      try {
+        const items = await fetchJSON('/api/wishlist');
+        const container = document.getElementById('wishlistContainer');
+        
+        if(items.length === 0){
+          container.innerHTML = '<div class="empty" style="grid-column:1/-1">Your wishlist is empty — <a href="/">Shop now</a></div>';
+          return;
+        }
+
+        container.innerHTML = '';
+        items.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <img src="${item.img}" alt="${item.title}" class="product-img" />
+            <div class="product-info">
+              <div class="product-title">${item.title}</div>
+              <div class="product-price">₹${item.price}</div>
+              <button class="btn" onclick="addToCart(${item.id}, '${item.title}', ${item.price})">Add to Cart</button>
+              <button class="btn btn-danger" style="margin-top:6px" onclick="removeFromWishlist(${item.id})">Remove</button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch(err) {
+        document.getElementById('wishlistContainer').innerHTML = '<div class="empty" style="grid-column:1/-1">Failed to load wishlist</div>';
+      }
+    }
+
+    async function removeFromWishlist(id){
+      try {
+        await fetchJSON('/api/wishlist/remove', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ id })
+        });
+        loadWishlist();
+      } catch(err) {
+        showNotification('Failed to remove item','error');
+      }
+    }
+
+    window.addToCart = async function(id, title, price){
+      try{
+        await fetch('/api/cart/add', { 
+          method: 'POST', 
+          headers: {'Content-Type':'application/json'}, 
+          body: JSON.stringify({ id, title, price, qty: 1 }) 
+        });
+        showNotification('✓ Item added to cart','success');
+      }catch(err){
+        showNotification('Failed to add to cart','error');
+      }
+    };
+
+    loadWishlist();
+  </script>
+</body>
+</html>

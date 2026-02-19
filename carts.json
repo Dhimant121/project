@@ -1,0 +1,16 @@
+{
+  "2": {
+    "2": {
+      "id": 2,
+      "title": "Denim Jacket",
+      "price": 1999,
+      "qty": 1
+    },
+    "3": {
+      "id": 3,
+      "title": "Sneakers",
+      "price": 2999,
+      "qty": 1
+    }
+  }
+}
