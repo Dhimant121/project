@@ -1,262 +1,901 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>RedStore — Online Shopping</title>
-	<meta name="description" content="RedStore: Trendy fashion, accessories and more — shop the latest collections." />
-	<style>
-		:root{--red:#e53935;--dark:#222;--muted:#666;--bg:#f7f7f8;--card:#fff}
-		*{box-sizing:border-box}
-		body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0;background:var(--bg);color:var(--dark)}
-		header{background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:20}
-		.topbar{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
-		.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--dark)}
-		.logo{width:40px;height:40px;background:linear-gradient(135deg,#ff8a80,var(--red));border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
-		nav{display:flex;gap:14px;align-items:center}
-		nav a{color:var(--muted);text-decoration:none;font-size:14px}
-		nav .cat-link{padding:8px 12px;border-radius:6px;transition:all 0.2s}
-		nav .cat-link:hover{background:#f5f5f5;color:var(--dark)}
-		.cat-container{position:relative;padding-bottom:12px}
-		.cat-dropdown{position:absolute;top:calc(100% + 8px);left:0;background:#fff;border:1px solid #eee;border-radius:8px;min-width:180px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:100;pointer-events:auto;opacity:0;visibility:hidden;transition:opacity 0.2s, visibility 0.2s}
-		.cat-container:hover .cat-dropdown{opacity:1;visibility:visible}
-		.cat-dropdown a{display:block;padding:10px 16px;color:var(--muted);text-decoration:none;border-bottom:1px solid #f5f5f5;font-size:14px;pointer-events:auto}
-		.cat-dropdown a:last-child{border-bottom:none}
-		.cat-dropdown a:hover{background:var(--red);color:#fff}
-		.search{flex:1;margin:0 18px}
-		.search input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #e6e6e6}
-		.actions{display:flex;gap:12px;align-items:center}
-		.cart{position:relative}
-		.cart button{background:transparent;border:1px solid #eee;padding:8px 10px;border-radius:8px;cursor:pointer}
-		.badge{position:absolute;right:0;top:-6px;background:var(--red);color:#fff;border-radius:999px;padding:2px 6px;font-size:12px}
-		.action-link{text-decoration:none;color:var(--muted);font-size:14px;cursor:pointer}
-		.action-link:hover{color:var(--red)}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RedStore | Everyday Shopping</title>
+  <meta name="description" content="RedStore marketplace for fashion, accessories, and daily deals." />
+  <style>
+    :root {
+      --ink-900: #0f1111;
+      --ink-700: #37475a;
+      --ink-500: #565959;
+      --surface-0: #ffffff;
+      --surface-50: #f3f6fa;
+      --surface-100: #e7ebf0;
+      --brand-500: #ff9900;
+      --brand-600: #e47911;
+      --accent-500: #146eb4;
+      --ok-500: #067d62;
+      --danger-500: #b12704;
+      --shadow-sm: 0 2px 10px rgba(15, 17, 17, 0.08);
+      --shadow-md: 0 10px 26px rgba(15, 17, 17, 0.14);
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --max-width: 1360px;
+    }
 
-		.hero{max-width:1100px;margin:18px auto;padding:20px;background:linear-gradient(90deg,#fff, #fff);display:grid;grid-template-columns:1fr 360px;gap:18px}
-		.hero-left{background:var(--card);padding:28px;border-radius:12px;display:flex;flex-direction:column;justify-content:center}
-		.hero-left h1{margin:0 0 8px;font-size:28px;color:var(--dark)}
-		.hero-left p{margin:0 0 16px;color:var(--muted)}
-		.cta{background:var(--red);color:#fff;padding:12px 16px;border-radius:10px;border:none;cursor:pointer}
-		.hero-right{background:linear-gradient(135deg,#fff,#fff);padding:12px;border-radius:12px;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center}
+    * {
+      box-sizing: border-box;
+    }
 
-		.container{max-width:1100px;margin:18px auto;padding:0 16px}
-		.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-		.card{background:var(--card);border-radius:12px;padding:12px;border:1px solid #eee;transition:transform 0.2s,box-shadow 0.2s}
-		.card:hover{transform:translateY(-4px);box-shadow:0 8px 16px rgba(0,0,0,0.1)}
-		.card img{width:100%;height:200px;object-fit:cover;border-radius:8px}
-		.card h3{margin:10px 0 6px;font-size:16px}
-		.price{font-weight:700;color:var(--dark)}
-		.muted{color:var(--muted);font-size:13px}
-		.card .actions{margin-top:10px}
-		.btn{padding:8px 10px;border-radius:8px;border:none;cursor:pointer}
-		.btn-primary{background:var(--red);color:#fff}
-		.btn-outline{background:transparent;border:1px solid #ddd}
+    body {
+      margin: 0;
+      color: var(--ink-900);
+      background:
+        radial-gradient(circle at 10% 10%, #fff7eb 0%, #fff7eb 18%, transparent 19%),
+        radial-gradient(circle at 90% 0%, #e8f4ff 0%, #e8f4ff 16%, transparent 17%),
+        var(--surface-50);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.35;
+    }
 
-		footer{margin-top:28px;padding:28px 0;background:#fff;border-top:1px solid #eee}
-		.footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:0 16px}
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-		@media (max-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}}
-		@media (max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.search{display:none}.topbar{padding:10px}.hero{padding:12px}}
-		@media (max-width:420px){.grid{grid-template-columns:1fr}.brand span{display:none}}
-	</style>
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .utility-bar {
+      background: var(--ink-900);
+      color: #ffffff;
+      padding: 8px 0;
+      font-size: 13px;
+    }
+
+    .wrap {
+      width: min(var(--max-width), calc(100% - 24px));
+      margin: 0 auto;
+    }
+
+    .utility-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .topbar {
+      background: #131a22;
+      color: #ffffff;
+      display: grid;
+      grid-template-columns: auto minmax(260px, 1fr) auto;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff;
+      min-width: 190px;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, #ffb03a 0%, #ff9900 45%, #e47911 100%);
+      font-weight: 800;
+      color: #0f1111;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      font-size: 20px;
+    }
+
+    .brand-sub {
+      color: #d2d9e0;
+      font-size: 12px;
+      margin-top: -2px;
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #ffffff;
+      border: 2px solid transparent;
+      transition: border-color 0.2s ease;
+    }
+
+    .search:focus-within {
+      border-color: var(--brand-500);
+    }
+
+    .search-label {
+      background: #f3f3f3;
+      color: #111;
+      font-size: 13px;
+      padding: 12px 14px;
+      border-right: 1px solid #d5d9d9;
+      white-space: nowrap;
+    }
+
+    .search input {
+      flex: 1;
+      border: 0;
+      padding: 12px;
+      font-size: 15px;
+      outline: 0;
+      min-width: 0;
+    }
+
+    .search button {
+      border: 0;
+      background: var(--brand-500);
+      color: #111;
+      font-weight: 700;
+      padding: 12px 15px;
+      cursor: pointer;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .action-link,
+    .cart button,
+    #darkModeBtn {
+      border: 1px solid transparent;
+      color: #ffffff;
+      background: transparent;
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .action-link:hover,
+    .cart button:hover,
+    #darkModeBtn:hover {
+      border-color: #ffffff;
+    }
+
+    .cart {
+      position: relative;
+    }
+
+    .badge {
+      position: absolute;
+      right: 2px;
+      top: -3px;
+      background: #ff5c5c;
+      color: #ffffff;
+      border-radius: 999px;
+      min-width: 20px;
+      padding: 2px 6px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    nav {
+      background: var(--ink-700);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 0;
+      scrollbar-width: thin;
+    }
+
+    .nav-item {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .nav-item:hover {
+      border-color: #ffffff;
+    }
+
+    main {
+      width: min(var(--max-width), calc(100% - 24px));
+      margin: 16px auto 30px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .hero-main {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      min-height: 300px;
+      color: #ffffff;
+      background-image: linear-gradient(90deg, rgba(15, 17, 17, 0.75) 0%, rgba(15, 17, 17, 0.25) 64%, rgba(15, 17, 17, 0.08) 100%), url('https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1600&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      box-shadow: var(--shadow-md);
+    }
+
+    .hero-content {
+      max-width: 56%;
+      padding: 30px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      background: rgba(255, 153, 0, 0.94);
+      color: #111;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(26px, 4vw, 44px);
+      line-height: 1.1;
+      letter-spacing: 0.2px;
+    }
+
+    .hero p {
+      margin: 0 0 16px;
+      color: #f2f6fa;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--brand-500);
+      color: #111;
+    }
+
+    .btn-outline {
+      border: 1px solid #d5d9d9;
+      background: #fff;
+      color: #111;
+    }
+
+    .hero-side {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .promo-card {
+      background: var(--surface-0);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid #dde3ea;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .promo-title {
+      font-size: 20px;
+      margin: 0;
+    }
+
+    .promo-copy {
+      margin: 0;
+      color: var(--ink-500);
+      font-size: 14px;
+    }
+
+    .promo-link {
+      color: var(--accent-500);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 0 0 14px;
+    }
+
+    .info-item {
+      background: var(--surface-0);
+      border-radius: var(--radius-md);
+      border: 1px solid #d9e0e7;
+      padding: 14px;
+      display: grid;
+      gap: 4px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .info-kicker {
+      color: var(--ink-500);
+      font-size: 12px;
+    }
+
+    .info-value {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .deal-strip {
+      background: linear-gradient(90deg, #ffffff 0%, #fff8ea 50%, #eef7ff 100%);
+      border: 1px solid #dce3ea;
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .deal-text strong {
+      color: var(--danger-500);
+      font-size: 18px;
+      margin-right: 8px;
+    }
+
+    .deal-text span {
+      color: var(--ink-500);
+      font-size: 14px;
+    }
+
+    .category-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 0 0 18px;
+    }
+
+    .category-chip {
+      background: var(--surface-0);
+      border: 1px solid #d9e0e7;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      font-weight: 700;
+    }
+
+    .category-chip small {
+      color: var(--accent-500);
+      font-weight: 600;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 8px 2px 10px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(22px, 3vw, 28px);
+      letter-spacing: 0.2px;
+    }
+
+    .section-head a {
+      color: var(--accent-500);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--surface-0);
+      border: 1px solid #dce3ea;
+      border-radius: 12px;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: 200px auto;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: #f8f8f8;
+    }
+
+    .card-body {
+      padding: 11px 11px 12px;
+      display: grid;
+      gap: 7px;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.3;
+      min-height: 38px;
+    }
+
+    .rating {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #1f7307;
+      font-weight: 700;
+    }
+
+    .rating span {
+      color: #6b6f70;
+      font-weight: 500;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .price {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .strike {
+      font-size: 12px;
+      color: #6b6f70;
+      text-decoration: line-through;
+    }
+
+    .discount {
+      color: var(--danger-500);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .muted {
+      color: var(--ink-500);
+      font-size: 12px;
+    }
+
+    .card .actions {
+      justify-content: stretch;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .card .btn {
+      border-radius: 10px;
+      padding: 9px 10px;
+      width: 100%;
+      font-size: 13px;
+    }
+
+    footer {
+      margin-top: 24px;
+      background: #131a22;
+      color: #d2d9e0;
+      border-top: 1px solid #293342;
+    }
+
+    .footer-inner {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding: 20px 0;
+      font-size: 13px;
+    }
+
+    @media (max-width: 1200px) {
+      .grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .brand {
+        min-width: 0;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-content {
+        max-width: 72%;
+      }
+
+      .info-grid,
+      .category-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .utility-row {
+        font-size: 12px;
+      }
+
+      nav {
+        padding-left: 4px;
+      }
+
+      .hero-content {
+        max-width: 100%;
+      }
+
+      .hero-main {
+        min-height: 270px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .wrap,
+      main {
+        width: min(var(--max-width), calc(100% - 14px));
+      }
+
+      .info-grid,
+      .category-row,
+      .footer-inner,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        grid-template-rows: 220px auto;
+      }
+
+      .card img {
+        height: 220px;
+      }
+
+      .hero-content {
+        padding: 18px;
+      }
+
+      .hero h1 {
+        font-size: 29px;
+      }
+
+      .brand-sub {
+        display: none;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/theme.css" />
 </head>
 <body>
-	<header>
-		<div class="topbar">
-			<a class="brand" href="/">
-				<div class="logo">R</div>
-				<div>
-					<div style="font-weight:700">RedStore</div>
-					<div style="font-size:12px;color:var(--muted)">redstore.in</div>
-				</div>
-			</a>
-			<nav>
-				<div class="cat-container">
-					<a class="cat-link" href="/men.html">Men</a>
-					<div class="cat-dropdown">
-						<a href="/men-tshirt.html">T-Shirts</a>
-						<a href="/men-shirt.html">Shirts</a>
-						<a href="/men-denim.html">Denim</a>
-					</div>
-				</div>
-				<div class="cat-container">
-					<a class="cat-link" href="/women.html">Women</a>
-					<div class="cat-dropdown">
-						<a href="/women-tshirt.html">T-Shirts</a>
-						<a href="/women-hoodie.html">Hoodie</a>
-						<a href="/women-kurta.html">Kurta</a>
-						<a href="/women-denim.html">Denim</a>
-						<a href="/women-pant.html">Pant</a>
-					</div>
-				</div>
-				<div class="cat-container">
-					<a class="cat-link" href="/kids.html">Kids</a>
-					<div class="cat-dropdown">
-						<a href="/kids-boys-top.html">Boy's Top</a>
-						<a href="/kids-girls-top.html">Girl's Top</a>
-						<a href="/kids-boys-bottom.html">Boy's Bottom</a>
-						<a href="/kids-girls-bottom.html">Girl's Bottom</a>
-					</div>
-				</div>
-				<div class="cat-container">
-					<a class="cat-link" href="/footwear.html">Footwear</a>
-					<div class="cat-dropdown">
-						<a href="/footwear-mens.html">Men's Footwear</a>
-						<a href="/footwear-womens.html">Women's Footwear</a>
-						<a href="/footwear-kids.html">Kid's Footwear</a>
-					</div>
-				</div>
-			</nav>
-			<div class="search" style="max-width:420px">
-				<input id="searchInput" placeholder="Search products, brands and more" />
-			</div>
-			<div class="actions">
-				<div class="cart">
-					<button id="cartBtn">Cart 🛒</button>
-					<div id="cartBadge" class="badge" style="display:none">0</div>
-				</div>
-				<a href="/wishlist.html" class="action-link">♥ Wishlist</a>
-				<a href="/orders.html" class="action-link">📦 Orders</a>
-				<a href="#" onclick="showSignIn();return false;" class="action-link" id="signinLink">Sign in</a>
-				<button id="darkModeBtn" class="action-link" style="background:none;border:none;cursor:pointer;padding:0;font-size:18px" title="Toggle dark mode">🌙</button>
-			</div>
-		</div>
-	</header>
+  <header class="site-header">
+    <div class="utility-bar">
+      <div class="wrap utility-row">
+        <div>Deliver to India | Fast shipping and easy returns</div>
+        <div>24/7 support | Secure payments</div>
+      </div>
+    </div>
 
-	<main>
-		<section class="hero">
-			<div class="hero-left">
-				<h1>Spring Sale — Up to 50% off</h1>
-				<p>Discover trending styles, exclusive drops and best sellers. Free shipping on orders over ₹999.</p>
-				<div style="display:flex;gap:10px">
-					<button class="cta" onclick="scrollToProducts()">Shop Now</button>
-					<button class="btn btn-outline">New Arrivals</button>
-				</div>
-			</div>
-			<div class="hero-right">
-				<img src="https://images.unsplash.com/photo-1520975698516-6c1d6b9e2c15?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b9b6b9f9a7b" alt="promo" style="width:100%;border-radius:8px;max-height:260px;object-fit:cover" />
-			</div>
-		</section>
+    <div class="topbar wrap">
+      <a class="brand" href="/">
+        <div class="logo">R</div>
+        <div>
+          <div class="brand-title">RedStore</div>
+          <div class="brand-sub">Smart shopping for every day</div>
+        </div>
+      </a>
 
-		<section class="container">
-			<h2 style="margin:6px 0 12px">Featured Products</h2>
-			<div id="products" class="grid"></div>
-		</section>
-	</main>
+      <div class="search" style="max-width:100%">
+        <div class="search-label">All</div>
+        <input id="searchInput" placeholder="Search products, brands and categories" />
+        <button type="button" aria-label="Search">Search</button>
+      </div>
 
-	<footer>
-		<div class="footer-inner">
-			<div style="color:var(--muted)">© <strong>RedStore</strong> — redstore.in</div>
-			<div style="color:var(--muted)">Support · Privacy · Terms</div>
-		</div>
-	</footer>
+      <div class="actions">
+        <div class="cart">
+          <button id="cartBtn">Cart</button>
+          <div id="cartBadge" class="badge" style="display:none">0</div>
+        </div>
+        <a href="/wishlist.html" class="action-link">Wishlist</a>
+        <a href="/orders.html" class="action-link">Orders</a>
+        <a href="#" onclick="showSignIn();return false;" class="action-link" id="signinLink">Sign in</a>
+        <button id="darkModeBtn" class="action-link" title="Toggle dark mode">Mode</button>
+      </div>
+    </div>
 
-	<script>
-		const productsData = [
-			// Men
-			{id:1,title:'Casual T-Shirt',price:499,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=6f3f6d4f4d4a',category:'men'},
-			{id:2,title:'Denim Jacket',price:1999,img:'https://images.unsplash.com/photo-1551028719-00167b16ebc5?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'men'},
-			{id:3,title:'Formal Shirt',price:899,img:'https://images.unsplash.com/photo-1577720643272-265a86e59c6b?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'men'},
-			{id:4,title:'Chino Pants',price:1299,img:'https://images.unsplash.com/photo-1548546682-c6dde2316e42?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'men'},
-			{id:5,title:'Polo Shirt',price:799,img:'https://images.unsplash.com/photo-1538685895594-da1b2e36c83e?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'men'},
-			{id:6,title:'Hoodie',price:1599,img:'https://images.unsplash.com/photo-1556821552-5b5b3efeae34?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'men'},
-			// Women
-			{id:7,title:'Women Dress',price:1499,img:'https://images.unsplash.com/photo-1595777721973-630b3203a5a6?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women'},
-			{id:8,title:'Blouse',price:899,img:'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women'},
-			{id:9,title:'Saree',price:1999,img:'https://images.unsplash.com/photo-1608411267207-a1a60e47f0d5?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women'},
-			{id:10,title:'Jeans',price:1299,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women'},
-			{id:11,title:'Lehenga',price:2499,img:'https://images.unsplash.com/photo-1583391733968-72097f5f0f0f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women'},
-			{id:12,title:'Tops',price:699,img:'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'women'},
-			// Kids
-			{id:13,title:'Kids T-Shirt',price:399,img:'https://images.unsplash.com/photo-1627074827782-f1a5eb146f9f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'kids'},
-			{id:14,title:'Kids Shorts',price:499,img:'https://images.unsplash.com/photo-1612127419326-4f6da2c72ff1?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'kids'},
-			{id:15,title:'Kids Dress',price:799,img:'https://images.unsplash.com/photo-1615252888930-d29eaeac4e97?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'kids'},
-			{id:16,title:'Kids Shoes',price:999,img:'https://images.unsplash.com/photo-1606992396889-7f6f9c4e6f35?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'kids'},
-			{id:17,title:'Kids Jacket',price:1199,img:'https://images.unsplash.com/photo-1617298317033-1eb92e670e1d?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'kids'},
-			{id:18,title:'Kids Cap',price:299,img:'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'kids'},
-			// Footwear
-			{id:19,title:'Sneakers',price:2999,img:'https://images.unsplash.com/photo-1520975698516-6c1d6b9e2c15?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b9b6b9f9a7b',category:'footwear'},
-			{id:20,title:'Running Shoes',price:3499,img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'footwear'},
-			{id:21,title:'Casual Loafers',price:1999,img:'https://images.unsplash.com/photo-1548062016-76a7e6b33e3b?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'footwear'},
-			{id:22,title:'Formal Shoes',price:2499,img:'https://images.unsplash.com/photo-1506361197048-46a149213204?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'footwear'},
-			{id:23,title:'Boots',price:3999,img:'https://images.unsplash.com/photo-1554707232-cb63aea249df?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'footwear'},
-			{id:24,title:'Sandals',price:899,img:'https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'footwear'},
-			// Accessories
-			{id:25,title:'Classic Watch',price:5499,img:'https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9a6b6e8a4f7c',category:'accessories'},
-			{id:26,title:'Sunglasses',price:899,img:'https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=9a6b6e8a4f7c',category:'accessories'},
-			{id:27,title:'Backpack',price:1299,img:'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'accessories'},
-			{id:28,title:'Belt',price:599,img:'https://images.unsplash.com/photo-1598461625169-a9ad1a0247f3?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3',category:'accessories'}
-		];
+    <nav class="wrap">
+      <a class="nav-item" href="/men.html">Men</a>
+      <a class="nav-item" href="/women.html">Women</a>
+      <a class="nav-item" href="/kids.html">Kids</a>
+      <a class="nav-item" href="/footwear.html">Footwear</a>
+      <a class="nav-item" href="/men-tshirt.html">T-Shirts</a>
+      <a class="nav-item" href="/women-kurta.html">Kurtas</a>
+      <a class="nav-item" href="/women-denim.html">Denim</a>
+      <a class="nav-item" href="/footwear-mens.html">Sneakers</a>
+      <a class="nav-item" href="/kids-boys-top.html">Kids Topwear</a>
+      <a class="nav-item" href="/orders.html">Deals</a>
+    </nav>
+  </header>
 
-		const cart = new Map();
+  <main>
+    <section class="hero">
+      <article class="hero-main">
+        <div class="hero-content">
+          <div class="hero-tag">Weekend Mega Sale</div>
+          <h1>Save up to 60% on fashion and footwear</h1>
+          <p>Fresh drops, top brands, and same-day dispatch on selected products.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="scrollToProducts()">Shop Now</button>
+            <button class="btn btn-outline" onclick="window.location.href='/orders.html'">Track Orders</button>
+          </div>
+        </div>
+      </article>
 
-		function renderProducts(list){
-			const container = document.getElementById('products');
-			container.innerHTML = '';
-			list.forEach(p=>{
-				const el = document.createElement('div'); el.className='card';
-				el.innerHTML = `
-					<img src="${p.img}" alt="${p.title}" />
-					<h3>${p.title}</h3>
-					<div class="muted">Best seller</div>
-					<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-						<div class="price">₹${p.price}</div>
-						<div class="actions">
-							<button class="btn btn-outline" onclick="view(${p.id})">View</button>
-							<button class="btn btn-primary" onclick="addToCart(${p.id})">Add</button>
-						</div>
-					</div>
-				`;
-				container.appendChild(el);
-			})
-		}
+      <aside class="hero-side">
+        <div class="promo-card">
+          <h2 class="promo-title">Today Deals</h2>
+          <p class="promo-copy">Flash discounts on best-selling clothing, accessories, and essentials.</p>
+          <a class="promo-link" href="#products">Explore deals</a>
+        </div>
+        <div class="promo-card">
+          <h2 class="promo-title">Member Perks</h2>
+          <p class="promo-copy">Extra 5% cashback, faster shipping, and priority support for signed-in users.</p>
+          <a class="promo-link" href="#" onclick="showSignIn();return false;">Sign in to unlock</a>
+        </div>
+      </aside>
+    </section>
 
-		function addToCart(id){
-			const qty = cart.get(id) || 0; cart.set(id, qty+1); updateCartBadge();
-					showNotification('Added to cart');
-		}
-		function updateCartBadge(){
-			const total = Array.from(cart.values()).reduce((a,b)=>a+b,0);
-			const badge = document.getElementById('cartBadge');
-			if(total>0){ badge.style.display='block'; badge.textContent=total } else badge.style.display='none';
-		}
-		function view(id){
-			const p = productsData.find(x=>x.id===id);
-					showNotification(p.title + ' — ₹' + p.price);
-		}
-		function scrollToProducts(){ document.getElementById('products').scrollIntoView({behavior:'smooth'}) }
+    <section class="info-grid" aria-label="highlights">
+      <article class="info-item">
+        <div class="info-kicker">Top-rated products</div>
+        <div class="info-value">1,000+</div>
+      </article>
+      <article class="info-item">
+        <div class="info-kicker">Average delivery</div>
+        <div class="info-value">2-3 days</div>
+      </article>
+      <article class="info-item">
+        <div class="info-kicker">Return window</div>
+        <div class="info-value">10 days</div>
+      </article>
+      <article class="info-item">
+        <div class="info-kicker">Happy customers</div>
+        <div class="info-value">50k+</div>
+      </article>
+    </section>
 
-		// Simple search
-		document.getElementById('searchInput').addEventListener('input', (e)=>{
-			const q = e.target.value.trim().toLowerCase();
-			if(!q) renderProducts(productsData);
-			else renderProducts(productsData.filter(p=>p.title.toLowerCase().includes(q)));
-		});
+    <section class="deal-strip" aria-label="deal-strip">
+      <div class="deal-text">
+        <strong>Deal of the Day:</strong>
+        <span>Extra 20% off on cart value above Rs 2,499. Use code SAVE20 at checkout.</span>
+      </div>
+      <button class="btn btn-primary" onclick="scrollToProducts()">Grab Offer</button>
+    </section>
 
-		// initial render
-		renderProducts(productsData);
+    <section class="category-row" aria-label="categories">
+      <a class="category-chip" href="/men.html">Men <small>View</small></a>
+      <a class="category-chip" href="/women.html">Women <small>View</small></a>
+      <a class="category-chip" href="/kids.html">Kids <small>View</small></a>
+      <a class="category-chip" href="/footwear.html">Footwear <small>View</small></a>
+    </section>
 
-		// Wire cart button to show simple cart summary
-		document.getElementById('cartBtn').addEventListener('click', ()=>{
-			window.location.href = '/cart.html';
-		});
+    <section>
+      <div class="section-head">
+        <h2>Featured Products</h2>
+        <a href="/men.html">See all collections</a>
+      </div>
+      <div id="products" class="grid"></div>
+    </section>
+  </main>
 
-		// Dark mode toggle
-		const darkModeBtn = document.getElementById('darkModeBtn');
-		const isDarkMode = localStorage.getItem('darkMode') === 'true';
-		if(isDarkMode) document.body.style.filter = 'invert(1) hue-rotate(180deg)';
-		darkModeBtn.addEventListener('click', (e)=>{
-			e.preventDefault();
-			const current = localStorage.getItem('darkMode') === 'true';
-			localStorage.setItem('darkMode', !current);
-			document.body.style.filter = !current ? 'none' : 'invert(1) hue-rotate(180deg)';
-		});
+  <footer>
+    <div class="wrap footer-inner">
+      <div>RedStore marketplace with secure checkout and trusted delivery.</div>
+      <div>Customer Support | Privacy Policy | Terms of Service</div>
+      <div>Copyright 2026 RedStore</div>
+    </div>
+  </footer>
 
-		// View product detail
-		window.view = function(id){
-			window.location.href = '/product-detail.html?id=' + id;
-		};
-	</script>
-	<script src="/script.js"></script>
-	</body>
-	</html>
+  <script>
+    const productsData = [
+      {id:1,title:'Casual T-Shirt',price:499,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop',category:'men'},
+      {id:2,title:'Denim Jacket',price:1999,img:'https://images.unsplash.com/photo-1551028719-00167b16ebc5?q=80&w=800&auto=format&fit=crop',category:'men'},
+      {id:3,title:'Formal Shirt',price:899,img:'https://images.unsplash.com/photo-1577720643272-265a86e59c6b?q=80&w=800&auto=format&fit=crop',category:'men'},
+      {id:4,title:'Chino Pants',price:1299,img:'https://images.unsplash.com/photo-1548546682-c6dde2316e42?q=80&w=800&auto=format&fit=crop',category:'men'},
+      {id:5,title:'Polo Shirt',price:799,img:'https://images.unsplash.com/photo-1538685895594-da1b2e36c83e?q=80&w=800&auto=format&fit=crop',category:'men'},
+      {id:6,title:'Hoodie',price:1599,img:'https://images.unsplash.com/photo-1556821552-5b5b3efeae34?q=80&w=800&auto=format&fit=crop',category:'men'},
+      {id:7,title:'Women Dress',price:1499,img:'https://images.unsplash.com/photo-1595777721973-630b3203a5a6?q=80&w=800&auto=format&fit=crop',category:'women'},
+      {id:8,title:'Blouse',price:899,img:'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?q=80&w=800&auto=format&fit=crop',category:'women'},
+      {id:9,title:'Saree',price:1999,img:'https://images.unsplash.com/photo-1608411267207-a1a60e47f0d5?q=80&w=800&auto=format&fit=crop',category:'women'},
+      {id:10,title:'Jeans',price:1299,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop',category:'women'},
+      {id:11,title:'Lehenga',price:2499,img:'https://images.unsplash.com/photo-1583391733968-72097f5f0f0f?q=80&w=800&auto=format&fit=crop',category:'women'},
+      {id:12,title:'Tops',price:699,img:'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?q=80&w=800&auto=format&fit=crop',category:'women'},
+      {id:13,title:'Kids T-Shirt',price:399,img:'https://images.unsplash.com/photo-1627074827782-f1a5eb146f9f?q=80&w=800&auto=format&fit=crop',category:'kids'},
+      {id:14,title:'Kids Shorts',price:499,img:'https://images.unsplash.com/photo-1612127419326-4f6da2c72ff1?q=80&w=800&auto=format&fit=crop',category:'kids'},
+      {id:15,title:'Kids Dress',price:799,img:'https://images.unsplash.com/photo-1615252888930-d29eaeac4e97?q=80&w=800&auto=format&fit=crop',category:'kids'},
+      {id:16,title:'Kids Shoes',price:999,img:'https://images.unsplash.com/photo-1606992396889-7f6f9c4e6f35?q=80&w=800&auto=format&fit=crop',category:'kids'},
+      {id:17,title:'Kids Jacket',price:1199,img:'https://images.unsplash.com/photo-1617298317033-1eb92e670e1d?q=80&w=800&auto=format&fit=crop',category:'kids'},
+      {id:18,title:'Kids Cap',price:299,img:'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop',category:'kids'},
+      {id:19,title:'Sneakers',price:2999,img:'https://images.unsplash.com/photo-1520975698516-6c1d6b9e2c15?q=80&w=800&auto=format&fit=crop',category:'footwear'},
+      {id:20,title:'Running Shoes',price:3499,img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop',category:'footwear'},
+      {id:21,title:'Casual Loafers',price:1999,img:'https://images.unsplash.com/photo-1548062016-76a7e6b33e3b?q=80&w=800&auto=format&fit=crop',category:'footwear'},
+      {id:22,title:'Formal Shoes',price:2499,img:'https://images.unsplash.com/photo-1506361197048-46a149213204?q=80&w=800&auto=format&fit=crop',category:'footwear'},
+      {id:23,title:'Boots',price:3999,img:'https://images.unsplash.com/photo-1554707232-cb63aea249df?q=80&w=800&auto=format&fit=crop',category:'footwear'},
+      {id:24,title:'Sandals',price:899,img:'https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop',category:'footwear'},
+      {id:25,title:'Classic Watch',price:5499,img:'https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?q=80&w=800&auto=format&fit=crop',category:'accessories'},
+      {id:26,title:'Sunglasses',price:899,img:'https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop',category:'accessories'},
+      {id:27,title:'Backpack',price:1299,img:'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop',category:'accessories'},
+      {id:28,title:'Belt',price:599,img:'https://images.unsplash.com/photo-1598461625169-a9ad1a0247f3?q=80&w=800&auto=format&fit=crop',category:'accessories'}
+    ];
+
+    const cart = new Map();
+
+    function renderProducts(list){
+      const container = document.getElementById('products');
+      container.innerHTML = '';
+      list.forEach((p, i) => {
+        const rating = (4 + ((p.id % 10) / 10)).toFixed(1);
+        const reviews = 140 + (p.id * 17);
+        const oldPrice = Math.round(p.price * 1.25);
+        const discount = Math.max(10, Math.round(((oldPrice - p.price) / oldPrice) * 100));
+
+        const el = document.createElement('article');
+        el.className = 'card';
+        el.style.animation = `fadeIn 260ms ease ${(i % 5) * 30}ms both`;
+
+        el.innerHTML = `
+          <img src="${p.img}" alt="${p.title}" loading="lazy" />
+          <div class="card-body">
+            <h3>${p.title}</h3>
+            <div class="rating">${rating} stars <span>(${reviews.toLocaleString()} ratings)</span></div>
+            <div class="price-row">
+              <div class="price">Rs ${p.price}</div>
+              <div class="strike">Rs ${oldPrice}</div>
+              <div class="discount">${discount}% off</div>
+            </div>
+            <div class="muted">Free delivery on eligible orders</div>
+            <div class="actions">
+              <button class="btn btn-outline" onclick="view(${p.id})">View</button>
+              <button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    function addToCart(id){
+      const qty = cart.get(id) || 0;
+      cart.set(id, qty + 1);
+      updateCartBadge();
+      showNotification('Item added to cart');
+    }
+
+    function updateCartBadge(){
+      const total = Array.from(cart.values()).reduce((a,b)=>a+b,0);
+      const badge = document.getElementById('cartBadge');
+      if(total > 0){
+        badge.style.display = 'block';
+        badge.textContent = total;
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    function scrollToProducts(){
+      document.getElementById('products').scrollIntoView({behavior:'smooth', block:'start'});
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      if(!q) renderProducts(productsData);
+      else renderProducts(productsData.filter(p => p.title.toLowerCase().includes(q)));
+    });
+
+    document.getElementById('cartBtn').addEventListener('click', () => {
+      window.location.href = '/cart.html';
+    });
+
+    document.getElementById('darkModeBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.body.classList.toggle('dark-visual');
+      if(document.body.classList.contains('dark-visual')){
+        document.body.style.filter = 'invert(1) hue-rotate(180deg)';
+      } else {
+        document.body.style.filter = 'none';
+      }
+    });
+
+    window.view = function(id){
+      window.location.href = '/product-detail.html?id=' + id;
+    };
+
+    if(!document.getElementById('local-anim-style')){
+      const style = document.createElement('style');
+      style.id = 'local-anim-style';
+      style.textContent = '@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}';
+      document.head.appendChild(style);
+    }
+
+    renderProducts(productsData);
+  </script>
+  <script src="/script.js"></script>
+  <script src="/theme.js"></script>
+</body>
+</html>
+
+
+
+

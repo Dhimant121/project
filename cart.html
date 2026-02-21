@@ -1,9 +1,9 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cart — RedStore</title>
+  <title>Cart � RedStore</title>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
     :root{--brand:#2874f0;--muted:#666;--card:#fff}
@@ -28,6 +28,7 @@
     .checkout{background:var(--brand);color:#fff;border:0;padding:12px;border-radius:6px;width:100%;cursor:pointer}
     @media(max-width:900px){.cart-shell{grid-template-columns:1fr}}
   </style>
+  <link rel="stylesheet" href="/theme.css" />
 </head>
 <body>
   <a href="/" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;margin-bottom:12px">
@@ -41,7 +42,7 @@
   <div class="cart-shell">
     <div class="items">
       <h2 style="margin:0 0 12px">Shopping Cart</h2>
-      <div id="itemsList">Loading…</div>
+      <div id="itemsList">Loading�</div>
     </div>
 
     <aside class="summary">
@@ -56,7 +57,7 @@
         <div id="promoMsg" style="font-size:12px;margin-top:4px"></div>
       </div>
       
-      <div id="summaryBody">Calculating…</div>
+      <div id="summaryBody">Calculating�</div>
       <div style="margin-top:12px"><button id="checkoutBtn" class="checkout">Place order</button></div>
       <div style="margin-top:8px;text-align:center;font-size:13px;color:var(--muted)">Safe and secure payments</div>
     </aside>
@@ -82,7 +83,7 @@
       const items = await fetchJSON('/api/cart');
       const container = document.getElementById('itemsList');
       container.innerHTML = '';
-      if(items.length===0){ container.innerHTML = '<div class="empty">Your cart is empty — <a href="/">shop now</a></div>'; document.getElementById('summaryBody').innerHTML='₹0'; return }
+      if(items.length===0){ container.innerHTML = '<div class="empty">Your cart is empty � <a href="/">shop now</a></div>'; document.getElementById('summaryBody').innerHTML='?0'; return }
 
       let subtotal = 0;
       items.forEach(it=>{
@@ -93,7 +94,7 @@
           <div class="meta">
             <div class="title">${it.title}</div>
             <div class="seller">Seller: <span class="muted">RedStore Retail</span></div>
-            <div class="price">₹${it.price}</div>
+            <div class="price">?${it.price}</div>
             <div class="controls">
               <div class="qty" data-id="${it.id}">
                 <button class="dec">-</button>
@@ -137,10 +138,10 @@
       
       const total = subtotal + shipping - discount;
       el.innerHTML = `
-        <div class="row"><div>Price (${count} items)</div><div>₹${subtotal}</div></div>
-        <div class="row"><div>Delivery Charges</div><div>${shipping===0?'<strong style="color:green">Free</strong>':'₹'+shipping}</div></div>
-        ${discount > 0 ? `<div class="row"><div>Discount</div><div style="color:green;font-weight:700">-₹${discount}</div></div>` : ''}
-        <div class="row"><div><strong>Total</strong></div><div><strong>₹${total}</strong></div></div>
+        <div class="row"><div>Price (${count} items)</div><div>?${subtotal}</div></div>
+        <div class="row"><div>Delivery Charges</div><div>${shipping===0?'<strong style="color:green">Free</strong>':'?'+shipping}</div></div>
+        ${discount > 0 ? `<div class="row"><div>Discount</div><div style="color:green;font-weight:700">-?${discount}</div></div>` : ''}
+        <div class="row"><div><strong>Total</strong></div><div><strong>?${total}</strong></div></div>
       `;
     }
 
@@ -159,11 +160,11 @@
         });
         
         window.currentPromo = promo;
-        document.getElementById('promoMsg').innerHTML = `<span style="color:green">✓ ${promo.code} applied!</span>`;
+        document.getElementById('promoMsg').innerHTML = `<span style="color:green">? ${promo.code} applied!</span>`;
         document.getElementById('promoInput').value = '';
         renderCart();
       } catch(err) {
-        document.getElementById('promoMsg').innerHTML = '<span style="color:red">✗ Invalid code</span>';
+        document.getElementById('promoMsg').innerHTML = '<span style="color:red">? Invalid code</span>';
       }
     }
 
@@ -209,7 +210,7 @@
             });
             
             if(verifyRes.ok){
-              showNotification(`✓ Payment successful! Order #${verifyRes.orderId}`,'success');
+              showNotification(`? Payment successful! Order #${verifyRes.orderId}`,'success');
               await fetch('/api/cart/clear', {method:'POST'});
               renderCart();
             }
@@ -232,6 +233,11 @@
     renderCart();
   </script>
   <script src="/script.js"></script>
+  <script src="/theme.js"></script>
 </body>
 </html>
+
+
+
+
 
