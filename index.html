@@ -800,8 +800,6 @@
       {id:28,title:'Belt',price:599,img:'https://images.unsplash.com/photo-1598461625169-a9ad1a0247f3?q=80&w=800&auto=format&fit=crop',category:'accessories'}
     ];
 
-    const cart = new Map();
-
     function renderProducts(list){
       const container = document.getElementById('products');
       container.innerHTML = '';
@@ -836,21 +834,9 @@
       });
     }
 
-    function addToCart(id){
-      const qty = cart.get(id) || 0;
-      cart.set(id, qty + 1);
-      updateCartBadge();
-      showNotification('Item added to cart');
-    }
-
-    function updateCartBadge(){
-      const total = Array.from(cart.values()).reduce((a,b)=>a+b,0);
-      const badge = document.getElementById('cartBadge');
-      if(total > 0){
-        badge.style.display = 'block';
-        badge.textContent = total;
-      } else {
-        badge.style.display = 'none';
+    async function addToCart(id){
+      if(typeof window.addToCart === 'function'){
+        await window.addToCart(id);
       }
     }
 
@@ -866,16 +852,6 @@
 
     document.getElementById('cartBtn').addEventListener('click', () => {
       window.location.href = '/cart.html';
-    });
-
-    document.getElementById('darkModeBtn').addEventListener('click', (e) => {
-      e.preventDefault();
-      document.body.classList.toggle('dark-visual');
-      if(document.body.classList.contains('dark-visual')){
-        document.body.style.filter = 'invert(1) hue-rotate(180deg)';
-      } else {
-        document.body.style.filter = 'none';
-      }
     });
 
     window.view = function(id){

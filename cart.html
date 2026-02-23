@@ -1,9 +1,9 @@
-<!doctype html>
+ï»¿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cart — RedStore</title>
+  <title>Cart â€” RedStore</title>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
     :root{--brand:#2874f0;--muted:#666;--card:#fff}
@@ -42,7 +42,7 @@
   <div class="cart-shell">
     <div class="items">
       <h2 style="margin:0 0 12px">Shopping Cart</h2>
-      <div id="itemsList">Loading…</div>
+      <div id="itemsList">Loadingâ€¦</div>
     </div>
 
     <aside class="summary">
@@ -57,7 +57,7 @@
         <div id="promoMsg" style="font-size:12px;margin-top:4px"></div>
       </div>
       
-      <div id="summaryBody">Calculating…</div>
+      <div id="summaryBody">Calculatingâ€¦</div>
       <div style="margin-top:12px"><button id="checkoutBtn" class="checkout">Place order</button></div>
       <div style="margin-top:8px;text-align:center;font-size:13px;color:var(--muted)">Safe and secure payments</div>
     </aside>
@@ -75,48 +75,60 @@
       {id:8,title:'Running Shorts',price:599,img:'https://images.unsplash.com/photo-1520975698516-6c1d6b9e2c15?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=0b9b6b9f9a7b'}
     ];
 
-    async function fetchJSON(url, opts){ const res = await fetch(url, opts); if(!res.ok) throw await res.json(); return res.json(); }
+    async function fetchJSON(url, opts){
+      const res = await fetch(url, opts);
+      const text = await res.text();
+      let data = {};
+      try { data = text ? JSON.parse(text) : {}; } catch(e) { data = { error: text || ("Request failed (" + res.status + ")") }; }
+      if(!res.ok) throw data;
+      return data;
+    }
 
     function findProduct(id){ return productsData.find(p=>p.id==id) || {img:'https://via.placeholder.com/96',title:'Product'} }
 
     async function renderCart(){
-      const items = await fetchJSON('/api/cart');
       const container = document.getElementById('itemsList');
       container.innerHTML = '';
-      if(items.length===0){ container.innerHTML = '<div class="empty">Your cart is empty — <a href="/">shop now</a></div>'; document.getElementById('summaryBody').innerHTML='?0'; return }
+      try {
+        const items = await fetchJSON('/api/cart');
+        if(items.length===0){ container.innerHTML = '<div class="empty">Your cart is empty â€” <a href="/">shop now</a></div>'; document.getElementById('summaryBody').innerHTML='?0'; return }
 
-      let subtotal = 0;
-      items.forEach(it=>{
-        const p = findProduct(it.id);
-        const div = document.createElement('div'); div.className='item';
-        div.innerHTML = `
-          <div class="thumb"><img src="${p.img}" alt="${it.title}"/></div>
-          <div class="meta">
-            <div class="title">${it.title}</div>
-            <div class="seller">Seller: <span class="muted">RedStore Retail</span></div>
-            <div class="price">?${it.price}</div>
-            <div class="controls">
-              <div class="qty" data-id="${it.id}">
-                <button class="dec">-</button>
-                <input type="number" min="1" value="${it.qty}" />
-                <button class="inc">+</button>
+        let subtotal = 0;
+        items.forEach(it=>{
+          const p = findProduct(it.id);
+          const div = document.createElement('div'); div.className='item';
+          div.innerHTML = `
+            <div class="thumb"><img src="${p.img}" alt="${it.title}"/></div>
+            <div class="meta">
+              <div class="title">${it.title}</div>
+              <div class="seller">Seller: <span class="muted">RedStore Retail</span></div>
+              <div class="price">?${it.price}</div>
+              <div class="controls">
+                <div class="qty" data-id="${it.id}">
+                  <button class="dec">-</button>
+                  <input type="number" min="1" value="${it.qty}" />
+                  <button class="inc">+</button>
+                </div>
+                <button class="remove" data-id="${it.id}" style="background:transparent;border:0;color:var(--muted);cursor:pointer">Remove</button>
               </div>
-              <button class="remove" data-id="${it.id}" style="background:transparent;border:0;color:var(--muted);cursor:pointer">Remove</button>
             </div>
-          </div>
-        `;
+          `;
 
-        // wire qty buttons
-        div.querySelector('.dec').addEventListener('click', async ()=>{ const input = div.querySelector('input'); let v = Math.max(1, parseInt(input.value||1)-1); input.value=v; await updateQty(it.id, v); });
-        div.querySelector('.inc').addEventListener('click', async ()=>{ const input = div.querySelector('input'); let v = parseInt(input.value||1)+1; input.value=v; await updateQty(it.id, v); });
-        div.querySelector('input').addEventListener('change', async (e)=>{ const v = Math.max(1, parseInt(e.target.value||1)); e.target.value=v; await updateQty(it.id, v); });
-        div.querySelector('.remove').addEventListener('click', async ()=>{ if(!confirm('Remove this item?')) return; await fetch('/api/cart/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:it.id})}); renderCart(); });
+          div.querySelector('.dec').addEventListener('click', async ()=>{ const input = div.querySelector('input'); let v = Math.max(1, parseInt(input.value||1)-1); input.value=v; await updateQty(it.id, v); });
+          div.querySelector('.inc').addEventListener('click', async ()=>{ const input = div.querySelector('input'); let v = parseInt(input.value||1)+1; input.value=v; await updateQty(it.id, v); });
+          div.querySelector('input').addEventListener('change', async (e)=>{ const v = Math.max(1, parseInt(e.target.value||1)); e.target.value=v; await updateQty(it.id, v); });
+          div.querySelector('.remove').addEventListener('click', async ()=>{ if(!confirm('Remove this item?')) return; await fetch('/api/cart/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:it.id})}); renderCart(); });
 
-        container.appendChild(div);
-        subtotal += it.price * it.qty;
-      });
+          container.appendChild(div);
+          subtotal += it.price * it.qty;
+        });
 
-      renderSummary(subtotal, items.length);
+        renderSummary(subtotal, items.length);
+      } catch(err) {
+        container.innerHTML = '<div class="empty">Unable to load cart right now. Please refresh the page.</div>';
+        document.getElementById('summaryBody').innerHTML = '?0';
+        if(typeof showNotification === 'function') showNotification(err.error || 'Failed to load cart', 'error');
+      }
     }
 
     async function updateQty(id, qty){ await fetch('/api/cart/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,qty})}); await renderCart(); }
@@ -236,6 +248,7 @@
   <script src="/theme.js"></script>
 </body>
 </html>
+
 
 
 

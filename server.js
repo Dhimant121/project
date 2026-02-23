@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -12,40 +12,20 @@ let Razorpay;
 try{ Razorpay = require('razorpay'); }catch(e){ Razorpay = null }
 
 const app = express();
-const isProd = process.env.NODE_ENV === 'production';
-const DATA_DIR = process.env.DATA_DIR || __dirname;
-const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-secret';
 
-// Ensure data directory exists (use Railway Volume path via DATA_DIR in production).
-try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch(e) { console.error('dataDir', e); }
-
-if (isProd) app.set('trust proxy', 1);
-
-app.use((req, res, next) => {
-  if (req.path === '/api/payment/webhook') return next();
-  return bodyParser.json()(req, res, next);
-});
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({
-  secret: SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 24 * 60 * 60 * 1000,
-    secure: isProd,
-    sameSite: isProd ? 'none' : 'lax'
-  }
-}));
+app.use(session({ secret: 'dev-secret', resave: false, saveUninitialized: true, cookie: { maxAge: 24 * 60 * 60 * 1000 } }));
 
 app.use(express.static(path.join(__dirname)));
 
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
-const CARTS_FILE = path.join(DATA_DIR, 'carts.json');
-const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
-const WISHLIST_FILE = path.join(DATA_DIR, 'wishlist.json');
-const REVIEWS_FILE = path.join(DATA_DIR, 'reviews.json');
-const PROMOS_FILE = path.join(DATA_DIR, 'promos.json');
-const EMAILS_FILE = path.join(DATA_DIR, 'emails.json');
+const USERS_FILE = path.join(__dirname, 'users.json');
+const CARTS_FILE = path.join(__dirname, 'carts.json');
+const ORDERS_FILE = path.join(__dirname, 'orders.json');
+const WISHLIST_FILE = path.join(__dirname, 'wishlist.json');
+const REVIEWS_FILE = path.join(__dirname, 'reviews.json');
+const PROMOS_FILE = path.join(__dirname, 'promos.json');
+const EMAILS_FILE = path.join(__dirname, 'emails.json');
 
 function loadJSON(file, fallback){ try{ return JSON.parse(fs.readFileSync(file,'utf8')) }catch(e){ return fallback }
 }
@@ -398,8 +378,8 @@ app.post('/api/admin/order/status', (req, res) => {
 });
 
 // Payment endpoints
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || '';
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_SHgh9mkUm7367I';
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'mZHQ6GgdlFRJrBRZbPN28MfD';
 
 // Return public key id to frontend
 app.get('/api/payment/key', (req, res) => {
@@ -408,47 +388,41 @@ app.get('/api/payment/key', (req, res) => {
 
 app.post('/api/payment/create-order', async (req, res) => {
   const { amount, items } = req.body; // amount expected in paise (integer)
-  const amountPaise = parseInt(amount, 10);
-  if (!amountPaise || amountPaise <= 0) {
-    return res.status(400).json({ error: 'valid amount required' });
+  if (!amount) return res.status(400).json({ error: 'amount required' });
+
+  // If Razorpay SDK available and secrets set, create a real Razorpay order
+  if (Razorpay && RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET) {
+    try {
+      const rzp = new Razorpay({ key_id: RAZORPAY_KEY_ID, key_secret: RAZORPAY_KEY_SECRET });
+      const options = {
+        amount: parseInt(amount, 10),
+        currency: 'INR',
+        receipt: 'rcpt_' + Date.now(),
+        payment_capture: 1
+      };
+      const order = await rzp.orders.create(options);
+      // store minimal mapping for later verification
+      if (!global.orders) global.orders = {};
+      global.orders[order.id] = { id: order.id, amount: order.amount, items, status: 'created', createdAt: Date.now() };
+      return res.json({ id: order.id, amount: order.amount, currency: order.currency });
+    } catch (err) {
+      console.error('razorpay.create', err);
+      // fallthrough to fake order below
+    }
   }
 
-  if (!Razorpay) {
-    return res.status(500).json({ error: 'Razorpay SDK not available on server' });
-  }
-
-  if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-    return res.status(500).json({ error: 'Razorpay keys not configured' });
-  }
-
-  try {
-    const rzp = new Razorpay({ key_id: RAZORPAY_KEY_ID, key_secret: RAZORPAY_KEY_SECRET });
-    const options = {
-      amount: amountPaise,
-      currency: 'INR',
-      receipt: 'rcpt_' + Date.now(),
-      payment_capture: 1
-    };
-    const order = await rzp.orders.create(options);
-    if (!global.orders) global.orders = {};
-    global.orders[order.id] = { id: order.id, amount: order.amount, items, status: 'created', createdAt: Date.now() };
-    return res.json({ id: order.id, amount: order.amount, currency: order.currency });
-  } catch (err) {
-    const reason = (err && err.error && (err.error.description || err.error.reason)) || err.message || 'unknown error';
-    console.error('razorpay.create', reason, err && err.error ? err.error : err);
-    return res.status(502).json({ error: 'Failed to create Razorpay order', details: reason });
-  }
+  // Fallback: create a local fake order id
+  const orderId = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  if (!global.orders) global.orders = {};
+  global.orders[orderId] = { id: orderId, amount, items, status: 'pending', createdAt: Date.now() };
+  res.json({ id: orderId, amount: parseInt(amount, 10), currency: 'INR' });
 });
 
 // Webhook endpoint — verify signature using raw body
 app.post('/api/payment/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   const signature = req.headers['x-razorpay-signature'];
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET || RAZORPAY_KEY_SECRET;
-  if (!Buffer.isBuffer(req.body)) {
-    console.warn('webhook raw body missing');
-    return res.status(400).send('invalid body');
-  }
-  const body = req.body.toString('utf8');
+  const body = req.body.toString();
   const expected = crypto.createHmac('sha256', secret).update(body).digest('hex');
   if (expected !== signature) {
     console.warn('webhook signature mismatch');
@@ -554,4 +528,3 @@ app.post('/api/payment/verify', (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
-

@@ -1,5 +1,12 @@
 (function(){
-  async function fetchJSON(url, opts){ const res = await fetch(url, opts); if(!res.ok) throw await res.json(); return res.json(); }
+  async function fetchJSON(url, opts){
+    const res = await fetch(url, opts);
+    const text = await res.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch(e) { data = { error: text || `Request failed (${res.status})` }; }
+    if(!res.ok) throw data;
+    return data;
+  }
 
   function ensureResponsiveStyles(){
     if(document.getElementById('rs-responsive-styles')) return;
@@ -120,12 +127,7 @@
       await syncCartBadge();
       showNotification('Item added to cart', 'success');
     }catch(err){
-      // fallback to in-memory behaviour if backend not available
-      if(typeof addToCart === 'function'){
-        console.debug('backend add failed, falling back');
-      }else{
-        showNotification(err.error || 'Failed to add to cart', 'error');
-      }
+      showNotification(err.error || 'Failed to add to cart', 'error');
     }
   }
 
@@ -280,16 +282,42 @@
     style.textContent = `
       body.dark-mode { background:#1a1a1a; color:#fff; }
       body.dark-mode header { background:#222; border-bottom-color:#333; }
+      body.dark-mode .utility-bar { background:#161b21; }
+      body.dark-mode .topbar { background:#222a34; }
       body.dark-mode nav a { color:#ccc; }
+      body.dark-mode nav { background:#243244; }
       body.dark-mode .cat-dropdown { background:#222; border-color:#333; }
       body.dark-mode .cat-dropdown a { color:#ccc; }
-      body.dark-mode .card, body.dark-mode .section { background:#222; border-color:#333; }
+      body.dark-mode .card, body.dark-mode .section, body.dark-mode .items, body.dark-mode .summary, body.dark-mode .filters, body.dark-mode .banner, body.dark-mode .promo-card { background:#222; border-color:#333; }
       body.dark-mode input { background:#333; color:#fff; border-color:#444; }
+      body.dark-mode .muted { color:#c3c9d2 !important; }
+      body.dark-mode footer { background:#11161d !important; border-top-color:#273447 !important; }
     `;
     document.head.appendChild(style);
   }
 
   initDarkMode();
+
+  function setDarkMode(enabled){
+    document.body.classList.toggle('dark-mode', enabled);
+    try { localStorage.setItem('darkMode', String(enabled)); } catch(e) {}
+  }
+
+  function bindDarkModeToggle(){
+    const btn = document.getElementById('darkModeBtn');
+    if(!btn || btn.dataset.darkBound === '1') return;
+    btn.dataset.darkBound = '1';
+
+    const initial = (() => {
+      try { return localStorage.getItem('darkMode') === 'true'; } catch(e) { return false; }
+    })();
+    setDarkMode(initial);
+
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      setDarkMode(!document.body.classList.contains('dark-mode'));
+    });
+  }
 
   // Account menu in navbar
   async function initAccountMenu(){
@@ -332,6 +360,7 @@
 
   document.addEventListener('DOMContentLoaded', ()=>{
     initAccountMenu();
+    bindDarkModeToggle();
   });
 
 })();
