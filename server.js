@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const multer = require('multer');
 // Load environment variables from .env if present
 require('dotenv').config();
 // Try to load Razorpay SDK (install with `npm install razorpay`)
@@ -26,6 +27,8 @@ const WISHLIST_FILE = path.join(__dirname, 'wishlist.json');
 const REVIEWS_FILE = path.join(__dirname, 'reviews.json');
 const PROMOS_FILE = path.join(__dirname, 'promos.json');
 const EMAILS_FILE = path.join(__dirname, 'emails.json');
+const PRODUCTS_FILE = path.join(__dirname, 'products.json');
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 function loadJSON(file, fallback){ try{ return JSON.parse(fs.readFileSync(file,'utf8')) }catch(e){ return fallback }
 }
@@ -37,6 +40,11 @@ let wishlistDb = loadJSON(WISHLIST_FILE, {});
 let reviewsDb = loadJSON(REVIEWS_FILE, {});
 let promosDb = loadJSON(PROMOS_FILE, { promos: [{ code: 'SAVE10', discount: 10, type: 'percent' }, { code: 'SAVE100', discount: 100, type: 'fixed' }] });
 let emailsDb = loadJSON(EMAILS_FILE, []);
+let productsDb = loadJSON(PRODUCTS_FILE, { nextId: 1, products: [] });
+
+if (!Array.isArray(productsDb.products)) productsDb.products = [];
+if (!productsDb.nextId || productsDb.nextId < 1) productsDb.nextId = 1;
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR);
 
 function saveUsers(){ try{ fs.writeFileSync(USERS_FILE, JSON.stringify(usersDb,null,2)) }catch(e){ console.error('saveUsers',e) } }
 function saveCarts(){ try{ fs.writeFileSync(CARTS_FILE, JSON.stringify(cartsDb,null,2)) }catch(e){ console.error('saveCarts',e) } }
@@ -45,6 +53,7 @@ function saveWishlist(){ try{ fs.writeFileSync(WISHLIST_FILE, JSON.stringify(wis
 function saveReviews(){ try{ fs.writeFileSync(REVIEWS_FILE, JSON.stringify(reviewsDb,null,2)) }catch(e){ console.error('saveReviews',e) } }
 function savePromos(){ try{ fs.writeFileSync(PROMOS_FILE, JSON.stringify(promosDb,null,2)) }catch(e){ console.error('savePromos',e) } }
 function saveEmails(){ try{ fs.writeFileSync(EMAILS_FILE, JSON.stringify(emailsDb,null,2)) }catch(e){ console.error('saveEmails',e) } }
+function saveProducts(){ try{ fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(productsDb,null,2)) }catch(e){ console.error('saveProducts',e) } }
 
 function sendEmail(to, subject, body){
   // Simple email stub: persist to emails.json
@@ -64,6 +73,31 @@ function getCart(req){
   if (!req.session.cart) req.session.cart = {};
   return req.session.cart;
 }
+
+function getWishlist(req){
+  if (req.session.user){
+    const uid = String(req.session.user.id);
+    if (!wishlistDb[uid]) wishlistDb[uid] = [];
+    req.session.wishlist = wishlistDb[uid];
+    return req.session.wishlist;
+  }
+  if (!Array.isArray(req.session.wishlist)) req.session.wishlist = [];
+  return req.session.wishlist;
+}
+
+function isAdmin(req){
+  return !!(req.session.user && req.session.user.email === 'admin@example.com');
+}
+
+const uploadStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, UPLOADS_DIR),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname || '');
+    const name = 'prod_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8) + ext;
+    cb(null, name);
+  }
+});
+const upload = multer({ storage: uploadStorage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 // Ensure any plaintext passwords are migrated to hashed passwords on startup
 (() => {
@@ -97,8 +131,18 @@ app.post('/api/signin', (req, res) => {
     if (cartsDb[uid][k]) cartsDb[uid][k].qty += sessCart[k].qty;
     else cartsDb[uid][k] = sessCart[k];
   });
+  // merge guest wishlist into persistent wishlist
+  const sessWishlist = Array.isArray(req.session.wishlist) ? req.session.wishlist : [];
+  wishlistDb[uid] = wishlistDb[uid] || [];
+  sessWishlist.forEach(item => {
+    if (!wishlistDb[uid].find(p => String(p.id) === String(item.id))) {
+      wishlistDb[uid].push(item);
+    }
+  });
   saveCarts();
+  saveWishlist();
   req.session.cart = cartsDb[uid];
+  req.session.wishlist = wishlistDb[uid];
   res.json({ ok: true, user: req.session.user });
 });
 
@@ -174,43 +218,58 @@ app.post('/api/signup', (req, res) => {
   usersDb.users[email] = { id, email, password: hashed, name, addresses: [], phone: '', darkMode: false };
   saveUsers();
   console.log('signup success:', email, 'id=', id);
-  cartsDb[String(id)] = cartsDb[String(id)] || {};
+  // Merge guest cart into new account cart on signup.
+  const uid = String(id);
+  const sessCart = req.session.cart || {};
+  cartsDb[uid] = cartsDb[uid] || {};
+  Object.keys(sessCart).forEach(k=>{
+    if (cartsDb[uid][k]) cartsDb[uid][k].qty += sessCart[k].qty;
+    else cartsDb[uid][k] = sessCart[k];
+  });
+
+  // Merge guest wishlist into new account wishlist on signup.
   wishlistDb[String(id)] = wishlistDb[String(id)] || [];
+  const sessWishlist = Array.isArray(req.session.wishlist) ? req.session.wishlist : [];
+  sessWishlist.forEach(item => {
+    if (!wishlistDb[String(id)].find(p => String(p.id) === String(item.id))) {
+      wishlistDb[String(id)].push(item);
+    }
+  });
   saveCarts();
   saveWishlist();
   req.session.user = { id, email, name };
-  req.session.cart = cartsDb[String(id)];
+  req.session.cart = cartsDb[uid];
+  req.session.wishlist = wishlistDb[uid];
   res.json({ ok: true, user: req.session.user });
 });
 
 // Wishlist endpoints
 app.get('/api/wishlist', (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'not-authenticated' });
-  const uid = String(req.session.user.id);
-  res.json(wishlistDb[uid] || []);
+  const wishlist = getWishlist(req);
+  res.json(wishlist);
 });
 
 app.post('/api/wishlist/add', (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'not-authenticated' });
   const { id, title, price, img } = req.body;
-  const uid = String(req.session.user.id);
-  if (!wishlistDb[uid]) wishlistDb[uid] = [];
-  if (!wishlistDb[uid].find(p => p.id === id)) {
-    wishlistDb[uid].push({ id, title, price, img, addedAt: Date.now() });
-    saveWishlist();
+  if (typeof id === 'undefined') return res.status(400).json({ error: 'id required' });
+  const wishlist = getWishlist(req);
+  if (!wishlist.find(p => String(p.id) === String(id))) {
+    wishlist.push({ id, title, price, img, addedAt: Date.now() });
+    if (req.session.user){ wishlistDb[String(req.session.user.id)] = wishlist; saveWishlist(); }
   }
-  res.json(wishlistDb[uid]);
+  res.json(wishlist);
 });
 
 app.post('/api/wishlist/remove', (req, res) => {
-  if (!req.session.user) return res.status(401).json({ error: 'not-authenticated' });
   const { id } = req.body;
-  const uid = String(req.session.user.id);
-  if (wishlistDb[uid]) {
-    wishlistDb[uid] = wishlistDb[uid].filter(p => p.id !== id);
+  if (typeof id === 'undefined') return res.status(400).json({ error: 'id required' });
+  const wishlist = getWishlist(req).filter(p => String(p.id) !== String(id));
+  req.session.wishlist = wishlist;
+  if (req.session.user){
+    wishlistDb[String(req.session.user.id)] = wishlist;
     saveWishlist();
   }
-  res.json(wishlistDb[uid] || []);
+  res.json(wishlist);
 });
 
 // Reviews endpoints
@@ -243,6 +302,94 @@ app.post('/api/promo/validate', (req, res) => {
   const promo = promosDb.promos.find(p => p.code.toUpperCase() === code.toUpperCase());
   if (!promo) return res.status(404).json({ error: 'Invalid promo code' });
   res.json(promo);
+});
+
+// Products endpoints
+app.get('/api/products', (req, res) => {
+  const q = String(req.query.search || '').trim().toLowerCase();
+  const category = String(req.query.category || '').trim().toLowerCase();
+  const limit = Math.min(200, Math.max(0, parseInt(req.query.limit, 10) || 0));
+  const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
+
+  let list = Array.isArray(productsDb.products) ? productsDb.products.slice() : [];
+  if (q){
+    list = list.filter(p => String(p.title || '').toLowerCase().includes(q));
+  }
+  if (category){
+    list = list.filter(p => String(p.category || '').toLowerCase() === category);
+  }
+
+  if (offset) list = list.slice(offset);
+  if (limit) list = list.slice(0, limit);
+  res.json(list);
+});
+
+app.get('/api/products/:id', (req, res) => {
+  const id = String(req.params.id);
+  const p = (productsDb.products || []).find(x => String(x.id) === id);
+  if (!p) return res.status(404).json({ error: 'not found' });
+  res.json(p);
+});
+
+app.post('/api/admin/products', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Unauthorized' });
+  const { title, price, img, category, desc, inventory } = req.body || {};
+  if (!title) return res.status(400).json({ error: 'title required' });
+  const id = productsDb.nextId++;
+  const product = {
+    id,
+    title: String(title),
+    price: Number(price) || 0,
+    img: String(img || ''),
+    category: String(category || 'general'),
+    desc: String(desc || ''),
+    inventory: Math.max(0, parseInt(inventory, 10) || 0),
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  };
+  productsDb.products.push(product);
+  saveProducts();
+  res.json(product);
+});
+
+app.put('/api/admin/products/:id', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Unauthorized' });
+  const id = String(req.params.id);
+  const product = (productsDb.products || []).find(p => String(p.id) === id);
+  if (!product) return res.status(404).json({ error: 'not found' });
+
+  const { title, price, img, category, desc, inventory } = req.body || {};
+  if (title !== undefined) product.title = String(title);
+  if (price !== undefined) product.price = Number(price) || 0;
+  if (img !== undefined) product.img = String(img);
+  if (category !== undefined) product.category = String(category);
+  if (desc !== undefined) product.desc = String(desc);
+  if (inventory !== undefined) product.inventory = Math.max(0, parseInt(inventory, 10) || 0);
+  product.updatedAt = Date.now();
+
+  saveProducts();
+  res.json(product);
+});
+
+app.delete('/api/admin/products/:id', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Unauthorized' });
+  const id = String(req.params.id);
+  const before = (productsDb.products || []).length;
+  productsDb.products = (productsDb.products || []).filter(p => String(p.id) !== id);
+  if (productsDb.products.length === before) return res.status(404).json({ error: 'not found' });
+  saveProducts();
+  res.json({ ok: true });
+});
+
+// Admin upload endpoint
+app.post('/api/admin/upload', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Unauthorized' });
+  upload.single('image')(req, res, (err) => {
+    if (err) return res.status(400).json({ error: 'upload failed' });
+    if (!req.file) return res.status(400).json({ error: 'no file' });
+    const rel = path.relative(__dirname, req.file.path).replace(/\\/g, '/');
+    res.json({ url: '/' + rel, filename: req.file.filename });
+  });
 });
 
 // User address endpoints

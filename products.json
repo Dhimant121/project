@@ -1,0 +1,33 @@
+{
+  "nextId": 29,
+  "products": [
+    {"id":1,"title":"Casual T-Shirt","price":499,"img":"https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop","category":"men","desc":"High-quality cotton t-shirt, perfect for everyday wear.","inventory":50},
+    {"id":2,"title":"Denim Jacket","price":1999,"img":"https://images.unsplash.com/photo-1551028719-00167b16ebc5?q=80&w=800&auto=format&fit=crop","category":"men","desc":"Classic denim jacket for all seasons.","inventory":40},
+    {"id":3,"title":"Formal Shirt","price":899,"img":"https://images.unsplash.com/photo-1577720643272-265a86e59c6b?q=80&w=800&auto=format&fit=crop","category":"men","desc":"Crisp formal shirt with a tailored fit.","inventory":60},
+    {"id":4,"title":"Chino Pants","price":1299,"img":"https://images.unsplash.com/photo-1548546682-c6dde2316e42?q=80&w=800&auto=format&fit=crop","category":"men","desc":"Comfortable chinos for work or weekend.","inventory":45},
+    {"id":5,"title":"Polo Shirt","price":799,"img":"https://images.unsplash.com/photo-1538685895594-da1b2e36c83e?q=80&w=800&auto=format&fit=crop","category":"men","desc":"Soft polo shirt with classic styling.","inventory":55},
+    {"id":6,"title":"Hoodie","price":1599,"img":"https://images.unsplash.com/photo-1556821552-5b5b3efeae34?q=80&w=800&auto=format&fit=crop","category":"men","desc":"Cozy hoodie with a relaxed fit.","inventory":35},
+    {"id":7,"title":"Women Dress","price":1499,"img":"https://images.unsplash.com/photo-1595777721973-630b3203a5a6?q=80&w=800&auto=format&fit=crop","category":"women","desc":"Elegant dress perfect for any occasion.","inventory":42},
+    {"id":8,"title":"Blouse","price":899,"img":"https://images.unsplash.com/photo-1598103442097-8b74394b95c6?q=80&w=800&auto=format&fit=crop","category":"women","desc":"Lightweight blouse for everyday styling.","inventory":58},
+    {"id":9,"title":"Saree","price":1999,"img":"https://images.unsplash.com/photo-1608411267207-a1a60e47f0d5?q=80&w=800&auto=format&fit=crop","category":"women","desc":"Traditional saree with a modern touch.","inventory":30},
+    {"id":10,"title":"Jeans","price":1299,"img":"https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop","category":"women","desc":"Everyday denim with a flattering fit.","inventory":48},
+    {"id":11,"title":"Lehenga","price":2499,"img":"https://images.unsplash.com/photo-1583391733968-72097f5f0f0f?q=80&w=800&auto=format&fit=crop","category":"women","desc":"Festive lehenga with vibrant detailing.","inventory":25},
+    {"id":12,"title":"Tops","price":699,"img":"https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?q=80&w=800&auto=format&fit=crop","category":"women","desc":"Everyday tops in breathable fabric.","inventory":62},
+    {"id":13,"title":"Kids T-Shirt","price":399,"img":"https://images.unsplash.com/photo-1627074827782-f1a5eb146f9f?q=80&w=800&auto=format&fit=crop","category":"kids","desc":"Soft cotton tee for kids.","inventory":70},
+    {"id":14,"title":"Kids Shorts","price":499,"img":"https://images.unsplash.com/photo-1612127419326-4f6da2c72ff1?q=80&w=800&auto=format&fit=crop","category":"kids","desc":"Lightweight shorts for playtime.","inventory":64},
+    {"id":15,"title":"Kids Dress","price":799,"img":"https://images.unsplash.com/photo-1615252888930-d29eaeac4e97?q=80&w=800&auto=format&fit=crop","category":"kids","desc":"Bright and comfy kids dress.","inventory":52},
+    {"id":16,"title":"Kids Shoes","price":999,"img":"https://images.unsplash.com/photo-1606992396889-7f6f9c4e6f35?q=80&w=800&auto=format&fit=crop","category":"kids","desc":"Supportive shoes for active kids.","inventory":40},
+    {"id":17,"title":"Kids Jacket","price":1199,"img":"https://images.unsplash.com/photo-1617298317033-1eb92e670e1d?q=80&w=800&auto=format&fit=crop","category":"kids","desc":"Warm jacket for cooler days.","inventory":36},
+    {"id":18,"title":"Kids Cap","price":299,"img":"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop","category":"kids","desc":"Everyday cap for sun protection.","inventory":80},
+    {"id":19,"title":"Sneakers","price":2999,"img":"https://images.unsplash.com/photo-1520975698516-6c1d6b9e2c15?q=80&w=800&auto=format&fit=crop","category":"footwear","desc":"Classic sneakers with cushioned sole.","inventory":28},
+    {"id":20,"title":"Running Shoes","price":3499,"img":"https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop","category":"footwear","desc":"Lightweight running shoes for daily miles.","inventory":32},
+    {"id":21,"title":"Casual Loafers","price":1999,"img":"https://images.unsplash.com/photo-1548062016-76a7e6b33e3b?q=80&w=800&auto=format&fit=crop","category":"footwear","desc":"Slip-on loafers for easy comfort.","inventory":30},
+    {"id":22,"title":"Formal Shoes","price":2499,"img":"https://images.unsplash.com/photo-1506361197048-46a149213204?q=80&w=800&auto=format&fit=crop","category":"footwear","desc":"Polished formal shoes for occasions.","inventory":26},
+    {"id":23,"title":"Boots","price":3999,"img":"https://images.unsplash.com/photo-1554707232-cb63aea249df?q=80&w=800&auto=format&fit=crop","category":"footwear","desc":"Rugged boots with sturdy build.","inventory":18},
+    {"id":24,"title":"Sandals","price":899,"img":"https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop","category":"footwear","desc":"Everyday sandals with comfort fit.","inventory":50},
+    {"id":25,"title":"Classic Watch","price":5499,"img":"https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?q=80&w=800&auto=format&fit=crop","category":"accessories","desc":"Timeless watch with metal strap.","inventory":15},
+    {"id":26,"title":"Sunglasses","price":899,"img":"https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop","category":"accessories","desc":"UV-protected sunglasses.","inventory":55},
+    {"id":27,"title":"Backpack","price":1299,"img":"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop","category":"accessories","desc":"Roomy backpack for daily carry.","inventory":44},
+    {"id":28,"title":"Belt","price":599,"img":"https://images.unsplash.com/photo-1598461625169-a9ad1a0247f3?q=80&w=800&auto=format&fit=crop","category":"accessories","desc":"Classic belt with metal buckle.","inventory":70}
+  ]
+}

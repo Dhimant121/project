@@ -1,4 +1,4 @@
-(function(){
+﻿(function(){
   async function fetchJSON(url, opts){
     const res = await fetch(url, opts);
     const text = await res.text();
@@ -131,8 +131,29 @@
     }
   }
 
+  window.addToWishlist = async function(id){
+    try{
+      const p = (typeof productsData !== 'undefined') ? productsData.find(x=>x.id===id) : null;
+      if(!p){ showNotification('Product not found', 'error'); return; }
+      await fetchJSON('/api/wishlist/add', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ id: p.id, title: p.title, price: p.price, img: p.img })
+      });
+      showNotification('Item added to wishlist', 'success');
+    }catch(err){
+      if(err && err.error === 'not-authenticated'){
+        showNotification('Please sign in to use wishlist', 'error');
+        if(typeof showSignIn === 'function') showSignIn();
+      }else{
+        showNotification((err && err.error) || 'Failed to add to wishlist', 'error');
+      }
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', ()=>{
-    const btn = document.getElementById('cartBtn'); if(btn) btn.addEventListener('click', ()=>{ window.location.href = '/cart.html' });
+    const btn = document.getElementById('cartBtn');
+    if(btn) btn.addEventListener('click', ()=>{ window.location.href = '/cart.html' });
     setupResponsiveHeader();
     syncCartBadge();
   });
@@ -171,7 +192,7 @@
           <div style="width:420px;padding:22px;background:#fff;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
               <strong style="font-size:18px">Sign in</strong>
-              <button id="rs-close" style="border:0;background:transparent;font-size:18px;cursor:pointer">✕</button>
+              <button id="rs-close" style="border:0;background:transparent;font-size:18px;cursor:pointer">x</button>
             </div>
             <div id="rs-error" style="color:#b00020;display:none;margin-bottom:8px"></div>
             <form id="rs-signin-form">
@@ -224,7 +245,7 @@
         <div style="background:#fff;padding:20px;border-radius:8px;max-width:420px;width:95%;pointer-events:auto">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
             <strong>Create account</strong>
-            <button id="rs-su-close" style="border:0;background:transparent;font-size:18px;cursor:pointer">✕</button>
+            <button id="rs-su-close" style="border:0;background:transparent;font-size:18px;cursor:pointer">x</button>
           </div>
           <div id="rs-su-error" style="color:#b00020;display:none;margin-bottom:8px"></div>
           <form id="rs-signup-form">
@@ -326,7 +347,7 @@
       const signinBtn = Array.from(document.querySelectorAll('a')).find(a => a.textContent.toLowerCase().includes('sign in'));
       
       if(signinBtn && account.user){
-        signinBtn.textContent = '👤 ' + account.user.name.split(' ')[0];
+        signinBtn.textContent = 'Account ' + account.user.name.split(' ')[0];
         signinBtn.href = '#';
         signinBtn.onclick = (e) => {
           e.preventDefault();
@@ -344,10 +365,10 @@
     menu.id = 'account-menu';
     menu.style.cssText = 'position:fixed;top:60px;right:20px;background:#fff;border:1px solid #e6e6e9;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:1000;min-width:180px';
     menu.innerHTML = `
-      <a href="/profile.html" style="display:block;padding:10px 16px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#111">👤 Profile</a>
-      <a href="/orders.html" style="display:block;padding:10px 16px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#111">📦 Orders</a>
-      <a href="/wishlist.html" style="display:block;padding:10px 16px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#111">♥ Wishlist</a>
-      <a href="#" onclick="fetch('/api/signout',{method:'POST'}).then(()=>window.location.reload());return false;" style="display:block;padding:10px 16px;text-decoration:none;color:#f44336">🚪 Logout</a>
+      <a href="/profile.html" style="display:block;padding:10px 16px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#111">Profile</a>
+      <a href="/orders.html" style="display:block;padding:10px 16px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#111">Orders</a>
+      <a href="/wishlist.html" style="display:block;padding:10px 16px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#111">Wishlist</a>
+      <a href="#" onclick="fetch('/api/signout',{method:'POST'}).then(()=>window.location.reload());return false;" style="display:block;padding:10px 16px;text-decoration:none;color:#f44336">Logout</a>
     `;
     document.body.appendChild(menu);
     
@@ -364,3 +385,4 @@
   });
 
 })();
+

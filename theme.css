@@ -263,6 +263,19 @@ body.rs-pro {
   color: #111 !important;
 }
 
+.rs-pro .rs-wishlist-btn {
+  border-color: #e19300 !important;
+  background: linear-gradient(145deg, #ffd36b 0%, #ffb21f 100%) !important;
+  color: #151515 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1px;
+}
+
+.rs-pro .card .actions {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+}
+
 .rs-pro .checkout {
   color: #111 !important;
 }

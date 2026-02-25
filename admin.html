@@ -27,8 +27,19 @@
     .status-delivered{background:#d4edda;color:#155724}
     .action-btn{padding:6px 10px;border-radius:4px;border:none;background:var(--brand);color:#fff;cursor:pointer;font-size:12px;margin-right:6px}
     .action-btn:hover{opacity:0.9}
+    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .form-grid .full{grid-column:1 / -1}
+    .form-row{display:grid;gap:6px}
+    .form-row label{font-size:12px;color:var(--muted)}
+    .form-row input,.form-row textarea,.form-row select{padding:10px;border:1px solid #e6e6e9;border-radius:6px;font-family:inherit;font-size:14px}
+    .product-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .btn-secondary{background:#fff;color:#111;border:1px solid #e6e6e9}
+    .danger-btn{background:#f44336}
+    .thumb{width:48px;height:48px;border-radius:6px;object-fit:cover;border:1px solid #e6e6e9;background:#fafafa}
+    .preview{display:flex;align-items:center;gap:10px}
+    .muted{color:var(--muted);font-size:12px}
     @media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:700px){.stats{grid-template-columns:1fr};table{font-size:12px}td,th{padding:8px}}
+    @media(max-width:700px){.stats{grid-template-columns:1fr};table{font-size:12px}td,th{padding:8px}.form-grid{grid-template-columns:1fr}}
   </style>
   <link rel="stylesheet" href="/theme.css" />
 </head>
@@ -77,10 +88,77 @@
         </tbody>
       </table>
     </div>
+
+    <div class="section">
+      <h2>Products</h2>
+      <div class="muted" style="margin-bottom:12px">Add, edit, or remove products from your catalog.</div>
+
+      <form id="productForm" class="form-grid">
+        <input type="hidden" id="productId" value="" />
+        <div class="form-row">
+          <label for="productTitle">Title</label>
+          <input id="productTitle" required />
+        </div>
+        <div class="form-row">
+          <label for="productPrice">Price (₹)</label>
+          <input id="productPrice" type="number" min="0" step="1" required />
+        </div>
+        <div class="form-row">
+          <label for="productCategory">Category</label>
+          <input id="productCategory" placeholder="men, women, kids, footwear, accessories" />
+        </div>
+        <div class="form-row">
+          <label for="productInventory">Inventory</label>
+          <input id="productInventory" type="number" min="0" step="1" value="0" />
+        </div>
+        <div class="form-row">
+          <label for="productImageUrl">Image URL</label>
+          <input id="productImageUrl" placeholder="https://..." />
+        </div>
+        <div class="form-row full">
+          <label for="productImageFile">Image Upload</label>
+          <input id="productImageFile" type="file" accept="image/*" />
+          <div class="preview">
+            <img id="productImagePreview" class="thumb" alt="" />
+            <span class="muted">Upload an image to preview and use it as the product image.</span>
+          </div>
+        </div>
+        <div class="form-row full">
+          <label for="productDesc">Description</label>
+          <textarea id="productDesc" rows="3"></textarea>
+        </div>
+        <div class="product-actions full">
+          <button type="submit" class="action-btn">Save Product</button>
+          <button type="button" class="action-btn btn-secondary" onclick="resetProductForm()">Clear</button>
+        </div>
+      </form>
+
+      <div style="margin-top:18px">
+        <table id="productsTable">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Inventory</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsBody">
+            <tr><td colspan="6" style="text-align:center;color:var(--muted)">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <script>
-    async function fetchJSON(url, opts){ const res = await fetch(url, opts); if(!res.ok) throw await res.json(); return res.json(); }
+    async function fetchJSON(url, opts){
+      const res = await fetch(url, opts);
+      if(!res.ok) throw await res.json();
+      return res.json();
+    }
 
     async function loadStats(){
       try {
@@ -151,8 +229,135 @@
       fetch('/api/signout', {method:'POST'}).then(() => window.location.href = '/');
     }
 
+    function resetProductForm(){
+      document.getElementById('productId').value = '';
+      document.getElementById('productTitle').value = '';
+      document.getElementById('productPrice').value = '';
+      document.getElementById('productCategory').value = '';
+      document.getElementById('productImageUrl').value = '';
+      document.getElementById('productInventory').value = '0';
+      document.getElementById('productDesc').value = '';
+      const preview = document.getElementById('productImagePreview');
+      preview.src = '';
+      preview.style.display = 'none';
+      document.getElementById('productImageFile').value = '';
+    }
+
+    async function loadProducts(){
+      try{
+        const products = await fetchJSON('/api/products');
+        const tbody = document.getElementById('productsBody');
+        if(!products.length){
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted)">No products</td></tr>';
+          return;
+        }
+        tbody.innerHTML = '';
+        products.forEach(p => {
+          const inv = typeof p.inventory === 'number' ? p.inventory : 0;
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${p.img ? `<img class="thumb" src="${p.img}" alt="">` : '-'}</td>
+            <td>${p.title || ''}</td>
+            <td>${p.category || ''}</td>
+            <td>₹${p.price || 0}</td>
+            <td>${inv}</td>
+            <td>
+              <button class="action-btn" onclick="editProduct(${p.id})">Edit</button>
+              <button class="action-btn danger-btn" onclick="deleteProduct(${p.id})">Delete</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      }catch(err){
+        document.getElementById('productsBody').innerHTML = '<tr><td colspan="5" style="text-align:center;color:red">Failed to load products</td></tr>';
+      }
+    }
+
+    async function editProduct(id){
+      try{
+        const p = await fetchJSON('/api/products/' + id);
+        document.getElementById('productId').value = p.id;
+        document.getElementById('productTitle').value = p.title || '';
+        document.getElementById('productPrice').value = p.price || 0;
+        document.getElementById('productCategory').value = p.category || '';
+        document.getElementById('productImageUrl').value = p.img || '';
+        document.getElementById('productInventory').value = typeof p.inventory === 'number' ? p.inventory : 0;
+        document.getElementById('productDesc').value = p.desc || '';
+        const preview = document.getElementById('productImagePreview');
+        if(p.img){
+          preview.src = p.img;
+          preview.style.display = 'inline-block';
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }catch(err){
+        showNotification('Failed to load product','error');
+      }
+    }
+
+    async function deleteProduct(id){
+      if(!confirm('Delete this product?')) return;
+      try{
+        await fetchJSON('/api/admin/products/' + id, { method: 'DELETE' });
+        loadProducts();
+      }catch(err){
+        showNotification('Failed to delete product','error');
+      }
+    }
+
+    document.getElementById('productForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('productId').value.trim();
+      const payload = {
+        title: document.getElementById('productTitle').value.trim(),
+        price: parseInt(document.getElementById('productPrice').value, 10) || 0,
+        category: document.getElementById('productCategory').value.trim(),
+        img: document.getElementById('productImageUrl').value.trim(),
+        desc: document.getElementById('productDesc').value.trim(),
+        inventory: parseInt(document.getElementById('productInventory').value, 10) || 0
+      };
+      try{
+        if(id){
+          await fetchJSON('/api/admin/products/' + id, {
+            method: 'PUT',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          });
+        }else{
+          await fetchJSON('/api/admin/products', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+          });
+        }
+        resetProductForm();
+        loadProducts();
+      }catch(err){
+        showNotification('Failed to save product','error');
+      }
+    });
+
+    document.getElementById('productImageFile').addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      try{
+        const form = new FormData();
+        form.append('image', file);
+        const res = await fetch('/api/admin/upload', { method: 'POST', body: form });
+        if(!res.ok) throw new Error('upload failed');
+        const data = await res.json();
+        const url = data.url || '';
+        document.getElementById('productImageUrl').value = url;
+        const preview = document.getElementById('productImagePreview');
+        preview.src = url;
+        preview.style.display = 'inline-block';
+      }catch(err){
+        showNotification('Image upload failed','error');
+      }
+    });
+
     loadStats();
     loadOrders();
+    loadProducts();
   </script>
   <script src="/theme.js"></script>
 </body>

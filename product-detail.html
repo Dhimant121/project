@@ -111,20 +111,21 @@
     async function fetchJSON(url, opts){ const res = await fetch(url, opts); if(!res.ok) throw await res.json(); return res.json(); }
 
     async function loadProduct(){
-      // In a real app, fetch from backend
-      const products = {
-        1: {title:'Casual T-Shirt',price:499,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800',cat:'Men',desc:'High-quality cotton t-shirt, perfect for everyday wear.'},
-        2: {title:'Denim Jacket',price:1999,img:'https://images.unsplash.com/photo-1551028719-00167b16ebc5?q=80&w=800',cat:'Men',desc:'Classic denim jacket for all seasons.'},
-        3: {title:'Women Dress',price:1499,img:'https://images.unsplash.com/photo-1595777707802-21b350ed2b3f?q=80&w=800',cat:'Women',desc:'Elegant dress perfect for any occasion.'},
-      };
+      let p = null;
+      try{
+        p = await fetchJSON('/api/products/' + productId);
+      }catch(e){}
 
-      const p = products[productId] || products[1];
+      if(!p){
+        p = { title:'Product', price:0, img:'', category:'Product', desc:'No description available.' };
+      }
+
       document.getElementById('productName').textContent = p.title;
       document.getElementById('productTitle').textContent = p.title;
-      document.getElementById('productCat').textContent = p.cat;
-      document.getElementById('productImage').src = p.img;
+      document.getElementById('productCat').textContent = p.category || 'Product';
+      if(p.img) document.getElementById('productImage').src = p.img;
       document.getElementById('productPrice').textContent = p.price;
-      document.getElementById('productDesc').textContent = p.desc;
+      document.getElementById('productDesc').textContent = p.desc || 'No description available.';
 
       // Get email if logged in
       try {

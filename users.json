@@ -1,5 +1,5 @@
 {
-  "nextId": 3,
+  "nextId": 4,
   "users": {
     "user@example.com": {
       "id": 1,
@@ -12,6 +12,12 @@
       "email": "dhimantkumarswami@gmail.com",
       "password": "$2a$10$jJ1iaDoXSKkNdNjVuW.jru2a1E4nA/CjTVu.Ag5XwTnjXZhCHX9BS",
       "name": "Dhimant"
+    },
+    "admin@example.com": {
+      "id": 3,
+      "email": "admin@example.com",
+      "password": "$2a$10$nSTO53Apbj0zTJJqNWkBVedkALMFsLoPfyEUt3lSfEZxK7wE18fg.",
+      "name": "Admin"
     }
   }
 }

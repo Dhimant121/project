@@ -62,6 +62,81 @@
     });
   }
 
+  function attachWishlistButtons() {
+    qa('.card').forEach(function (card) {
+      const actions = q('.actions', card);
+      if (!actions || q('.rs-wishlist-btn', actions)) return;
+
+      const viewBtn = Array.from(actions.querySelectorAll('button')).find(function (b) {
+        return /^view$/i.test((b.textContent || '').trim());
+      });
+      if (viewBtn) viewBtn.remove();
+
+      const addBtn = Array.from(actions.querySelectorAll('button')).find(function (b) {
+        return /add/i.test((b.textContent || '').toLowerCase());
+      });
+      if (!addBtn) return;
+
+      const onclickValue = addBtn.getAttribute('onclick') || '';
+      const match = onclickValue.match(/addToCart\((\d+)\)/);
+      if (!match) return;
+
+      const productId = Number(match[1]);
+      if (!productId) return;
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-primary rs-wishlist-btn';
+      btn.textContent = 'Add to Wishlist';
+      btn.addEventListener('click', async function (e) {
+        e.preventDefault();
+        if (typeof window.addToWishlist === 'function') {
+          await window.addToWishlist(productId);
+        }
+      });
+      actions.appendChild(btn);
+    });
+  }
+
+  function attachCardNavigation() {
+    qa('.card').forEach(function (card) {
+      const actions = q('.actions', card);
+      if (!actions) return;
+
+      const addBtn = Array.from(actions.querySelectorAll('button')).find(function (b) {
+        return /add/i.test((b.textContent || '').toLowerCase());
+      });
+      if (!addBtn) return;
+
+      const onclickValue = addBtn.getAttribute('onclick') || '';
+      const match = onclickValue.match(/addToCart\((\d+)\)/);
+      if (!match) return;
+      const productId = Number(match[1]);
+      if (!productId) return;
+
+      const goToProduct = function () {
+        if (typeof window.view === 'function') window.view(productId);
+        else window.location.href = '/product-detail.html?id=' + productId;
+      };
+
+      const clickable = []
+        .concat(qa('img', card))
+        .concat(qa('h3', card))
+        .concat(qa('.product-title', card))
+        .concat(qa('.title', card));
+
+      clickable.forEach(function (el) {
+        if (!el || el.dataset.rsNavBound === '1') return;
+        el.dataset.rsNavBound = '1';
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          goToProduct();
+        });
+      });
+    });
+  }
+
   function decoratePageBlocks() {
     qa('.banner, .hero, .items, .summary, .filters').forEach(function (el, i) {
       el.classList.add('fade-in');
@@ -82,11 +157,17 @@
   function init() {
     applyShell();
     decorateCards();
+    attachWishlistButtons();
+    attachCardNavigation();
     decoratePageBlocks();
     bindDarkModeLabel();
 
     const target = q('#products') || document.body;
-    const obs = new MutationObserver(function () { decorateCards(); });
+    const obs = new MutationObserver(function () {
+      decorateCards();
+      attachWishlistButtons();
+      attachCardNavigation();
+    });
     obs.observe(target, { childList: true, subtree: true });
   }
 

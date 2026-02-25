@@ -769,7 +769,7 @@
   </footer>
 
   <script>
-    const productsData = [
+    const fallbackProducts = [
       {id:1,title:'Casual T-Shirt',price:499,img:'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=800&auto=format&fit=crop',category:'men'},
       {id:2,title:'Denim Jacket',price:1999,img:'https://images.unsplash.com/photo-1551028719-00167b16ebc5?q=80&w=800&auto=format&fit=crop',category:'men'},
       {id:3,title:'Formal Shirt',price:899,img:'https://images.unsplash.com/photo-1577720643272-265a86e59c6b?q=80&w=800&auto=format&fit=crop',category:'men'},
@@ -799,6 +799,25 @@
       {id:27,title:'Backpack',price:1299,img:'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=800&auto=format&fit=crop',category:'accessories'},
       {id:28,title:'Belt',price:599,img:'https://images.unsplash.com/photo-1598461625169-a9ad1a0247f3?q=80&w=800&auto=format&fit=crop',category:'accessories'}
     ];
+    let productsData = fallbackProducts.slice();
+
+    async function fetchJSON(url){
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('Request failed');
+      return res.json();
+    }
+
+    async function loadProducts(){
+      try{
+        const data = await fetchJSON('/api/products');
+        if(Array.isArray(data) && data.length){
+          productsData = data;
+        }
+      }catch(e){
+        productsData = fallbackProducts.slice();
+      }
+      renderProducts(productsData);
+    }
 
     function renderProducts(list){
       const container = document.getElementById('products');
@@ -865,7 +884,7 @@
       document.head.appendChild(style);
     }
 
-    renderProducts(productsData);
+    loadProducts();
   </script>
   <script src="/script.js"></script>
   <script src="/theme.js"></script>
