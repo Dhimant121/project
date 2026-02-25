@@ -347,9 +347,11 @@
       const signinBtn = Array.from(document.querySelectorAll('a')).find(a => a.textContent.toLowerCase().includes('sign in'));
       
       if(signinBtn && account.user){
-        signinBtn.textContent = 'Account ' + account.user.name.split(' ')[0];
-        signinBtn.href = '#';
+        const isAdmin = account.user.email === 'admin@example.com';
+        signinBtn.textContent = isAdmin ? 'Account Admin' : ('Account ' + account.user.name.split(' ')[0]);
+        signinBtn.href = isAdmin ? '/admin.html' : '#';
         signinBtn.onclick = (e) => {
+          if(isAdmin) return;
           e.preventDefault();
           const menu = document.getElementById('account-menu');
           if(menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
@@ -368,6 +370,7 @@
       <a href="/profile.html" style="display:block;padding:10px 16px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#111">Profile</a>
       <a href="/orders.html" style="display:block;padding:10px 16px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#111">Orders</a>
       <a href="/wishlist.html" style="display:block;padding:10px 16px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#111">Wishlist</a>
+      <a href="/admin.html" style="display:block;padding:10px 16px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#111">Admin</a>
       <a href="#" onclick="fetch('/api/signout',{method:'POST'}).then(()=>window.location.reload());return false;" style="display:block;padding:10px 16px;text-decoration:none;color:#f44336">Logout</a>
     `;
     document.body.appendChild(menu);
