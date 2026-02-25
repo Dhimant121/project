@@ -816,7 +816,8 @@
       }catch(e){
         productsData = fallbackProducts.slice();
       }
-      renderProducts(productsData);
+      const popular = productsData.filter(p => p.popular);
+      renderProducts(popular.length ? popular : productsData);
     }
 
     function renderProducts(list){

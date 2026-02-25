@@ -333,7 +333,7 @@ app.get('/api/products/:id', (req, res) => {
 
 app.post('/api/admin/products', (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Unauthorized' });
-  const { title, price, img, category, desc, inventory } = req.body || {};
+  const { title, price, img, category, desc, inventory, popular } = req.body || {};
   if (!title) return res.status(400).json({ error: 'title required' });
   const id = productsDb.nextId++;
   const product = {
@@ -344,6 +344,7 @@ app.post('/api/admin/products', (req, res) => {
     category: String(category || 'general'),
     desc: String(desc || ''),
     inventory: Math.max(0, parseInt(inventory, 10) || 0),
+    popular: !!popular,
     createdAt: Date.now(),
     updatedAt: Date.now()
   };
@@ -358,13 +359,14 @@ app.put('/api/admin/products/:id', (req, res) => {
   const product = (productsDb.products || []).find(p => String(p.id) === id);
   if (!product) return res.status(404).json({ error: 'not found' });
 
-  const { title, price, img, category, desc, inventory } = req.body || {};
+  const { title, price, img, category, desc, inventory, popular } = req.body || {};
   if (title !== undefined) product.title = String(title);
   if (price !== undefined) product.price = Number(price) || 0;
   if (img !== undefined) product.img = String(img);
   if (category !== undefined) product.category = String(category);
   if (desc !== undefined) product.desc = String(desc);
   if (inventory !== undefined) product.inventory = Math.max(0, parseInt(inventory, 10) || 0);
+  if (popular !== undefined) product.popular = !!popular;
   product.updatedAt = Date.now();
 
   saveProducts();

@@ -104,12 +104,43 @@
           <input id="productPrice" type="number" min="0" step="1" required />
         </div>
         <div class="form-row">
-          <label for="productCategory">Category</label>
-          <input id="productCategory" placeholder="men, women, kids, footwear, accessories" />
+          <label for="productCategory">Category / Subcategory</label>
+          <select id="productCategory">
+            <option value="">Select category</option>
+            <option value="men">Men</option>
+            <option value="women">Women</option>
+            <option value="kids">Kids</option>
+            <option value="footwear">Footwear</option>
+            <option value="accessories">Accessories</option>
+            <option value="men-tshirt">Men - T-Shirts</option>
+            <option value="men-shirt">Men - Shirts</option>
+            <option value="men-denim">Men - Denim</option>
+            <option value="women-tshirt">Women - T-Shirts</option>
+            <option value="women-kurta">Women - Kurtas</option>
+            <option value="women-hoodie">Women - Hoodies</option>
+            <option value="women-denim">Women - Denim</option>
+            <option value="women-pant">Women - Pants</option>
+            <option value="kids-boys-top">Kids - Boys Top</option>
+            <option value="kids-boys-bottom">Kids - Boys Bottom</option>
+            <option value="kids-girls-top">Kids - Girls Top</option>
+            <option value="kids-girls-bottom">Kids - Girls Bottom</option>
+            <option value="footwear-mens">Footwear - Mens</option>
+            <option value="footwear-womens">Footwear - Womens</option>
+            <option value="footwear-kids">Footwear - Kids</option>
+            <option value="sneakers">Sneakers</option>
+            <option value="tshirt">T-Shirt</option>
+          </select>
         </div>
         <div class="form-row">
           <label for="productInventory">Inventory</label>
           <input id="productInventory" type="number" min="0" step="1" value="0" />
+        </div>
+        <div class="form-row">
+          <label for="productPopular">Popular on Home</label>
+          <select id="productPopular">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
         </div>
         <div class="form-row">
           <label for="productImageUrl">Image URL</label>
@@ -134,6 +165,34 @@
       </form>
 
       <div style="margin-top:18px">
+        <div class="form-row" style="max-width:260px;margin-bottom:10px">
+          <label for="productsFilter">Filter by category</label>
+          <select id="productsFilter">
+            <option value="">All</option>
+            <option value="men">Men</option>
+            <option value="women">Women</option>
+            <option value="kids">Kids</option>
+            <option value="footwear">Footwear</option>
+            <option value="accessories">Accessories</option>
+            <option value="men-tshirt">Men - T-Shirts</option>
+            <option value="men-shirt">Men - Shirts</option>
+            <option value="men-denim">Men - Denim</option>
+            <option value="women-tshirt">Women - T-Shirts</option>
+            <option value="women-kurta">Women - Kurtas</option>
+            <option value="women-hoodie">Women - Hoodies</option>
+            <option value="women-denim">Women - Denim</option>
+            <option value="women-pant">Women - Pants</option>
+            <option value="kids-boys-top">Kids - Boys Top</option>
+            <option value="kids-boys-bottom">Kids - Boys Bottom</option>
+            <option value="kids-girls-top">Kids - Girls Top</option>
+            <option value="kids-girls-bottom">Kids - Girls Bottom</option>
+            <option value="footwear-mens">Footwear - Mens</option>
+            <option value="footwear-womens">Footwear - Womens</option>
+            <option value="footwear-kids">Footwear - Kids</option>
+            <option value="sneakers">Sneakers</option>
+            <option value="tshirt">T-Shirt</option>
+          </select>
+        </div>
         <table id="productsTable">
           <thead>
             <tr>
@@ -142,11 +201,12 @@
               <th>Category</th>
               <th>Price</th>
               <th>Inventory</th>
+              <th>Popular</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="productsBody">
-            <tr><td colspan="6" style="text-align:center;color:var(--muted)">Loading...</td></tr>
+            <tr><td colspan="7" style="text-align:center;color:var(--muted)">Loading...</td></tr>
           </tbody>
         </table>
       </div>
@@ -236,6 +296,7 @@
       document.getElementById('productCategory').value = '';
       document.getElementById('productImageUrl').value = '';
       document.getElementById('productInventory').value = '0';
+      document.getElementById('productPopular').value = 'false';
       document.getElementById('productDesc').value = '';
       const preview = document.getElementById('productImagePreview');
       preview.src = '';
@@ -245,15 +306,19 @@
 
     async function loadProducts(){
       try{
-        const products = await fetchJSON('/api/products');
+        const filter = document.getElementById('productsFilter');
+        const category = filter ? filter.value.trim() : '';
+        const url = category ? ('/api/products?category=' + encodeURIComponent(category)) : '/api/products';
+        const products = await fetchJSON(url);
         const tbody = document.getElementById('productsBody');
         if(!products.length){
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted)">No products</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted)">No products</td></tr>';
           return;
         }
         tbody.innerHTML = '';
         products.forEach(p => {
           const inv = typeof p.inventory === 'number' ? p.inventory : 0;
+          const pop = p.popular ? 'Yes' : 'No';
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${p.img ? `<img class="thumb" src="${p.img}" alt="">` : '-'}</td>
@@ -261,6 +326,7 @@
             <td>${p.category || ''}</td>
             <td>₹${p.price || 0}</td>
             <td>${inv}</td>
+            <td>${pop}</td>
             <td>
               <button class="action-btn" onclick="editProduct(${p.id})">Edit</button>
               <button class="action-btn danger-btn" onclick="deleteProduct(${p.id})">Delete</button>
@@ -282,6 +348,7 @@
         document.getElementById('productCategory').value = p.category || '';
         document.getElementById('productImageUrl').value = p.img || '';
         document.getElementById('productInventory').value = typeof p.inventory === 'number' ? p.inventory : 0;
+        document.getElementById('productPopular').value = p.popular ? 'true' : 'false';
         document.getElementById('productDesc').value = p.desc || '';
         const preview = document.getElementById('productImagePreview');
         if(p.img){
@@ -313,7 +380,8 @@
         category: document.getElementById('productCategory').value.trim(),
         img: document.getElementById('productImageUrl').value.trim(),
         desc: document.getElementById('productDesc').value.trim(),
-        inventory: parseInt(document.getElementById('productInventory').value, 10) || 0
+        inventory: parseInt(document.getElementById('productInventory').value, 10) || 0,
+        popular: document.getElementById('productPopular').value === 'true'
       };
       try{
         if(id){
@@ -354,6 +422,11 @@
         showNotification('Image upload failed','error');
       }
     });
+
+    const productsFilter = document.getElementById('productsFilter');
+    if(productsFilter){
+      productsFilter.addEventListener('change', () => loadProducts());
+    }
 
     loadStats();
     loadOrders();
